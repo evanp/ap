@@ -1,0 +1,19 @@
+{
+  "name": "ap",
+  "version": "0.1.0",
+  "description": "command-line ActivityPub client",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "activitypub",
+    "social",
+    "commandline",
+    "ap",
+    "oauth2",
+    "fediverse"
+  ],
+  "author": "Evan Prodromou <evan@prodromou.name>",
+  "license": "GPL-3.0-or-later"
+}
