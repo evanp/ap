@@ -118,12 +118,8 @@ export class LoginCommand extends Command {
   }
 
   async writeToken(results) {
-    const filename = join(process.env.HOME, '.ap-tokens')
-    let data = {}
-    if (existsSync(filename)) {
-      data = JSON.parse(readFileSync(filename))
-    }
-    data[this.actorId] = results
-    writeFileSync(filename, JSON.stringify(data))
+    const filename = join(process.env.HOME, '.ap-token')
+    results = {actorId: this.actorId, loginAt: Date.now()/1000, ...results}
+    writeFileSync(filename, JSON.stringify(results))
   }
 }
