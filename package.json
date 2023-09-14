@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "command-line ActivityPub client",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "node --test"
   },
@@ -15,5 +16,8 @@
     "fediverse"
   ],
   "author": "Evan Prodromou <evan@prodromou.name>",
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "open": "^9.1.0"
+  }
 }
