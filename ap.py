@@ -22,6 +22,12 @@ def main():
     note_parser = typeparsers.add_parser('note', help='Create a new note')
     note_parser.add_argument('text', nargs=argparse.REMAINDER, help='Note text')
 
+    inbox_parser = subparsers.add_parser('inbox', help='View inbox')
+    outbox_parser = subparsers.add_parser('outbox', help='View outbox')
+    followers_parser = subparsers.add_parser('followers', help='View followers')
+    following_parser = subparsers.add_parser('following', help='View following')
+    liked_parser = subparsers.add_parser('liked', help='View liked items')
+
     args = parser.parse_args()
 
     if args.subcommand == 'login':
@@ -31,6 +37,16 @@ def main():
             commands.create_note(args.text, args.public, args.followers_only)
         else:
             print(f"Unknown type: {args.type}")
+    elif args.subcommand == 'inbox':
+        commands.inbox()
+    elif args.subcommand == 'outbox':
+        commands.outbox()
+    elif args.subcommand == 'followers':
+        commands.followers()
+    elif args.subcommand == 'following':
+        commands.following()
+    elif args.subcommand == 'liked':
+        commands.liked()
     else:
         print(f"Unknown command: {args.subcommand}")
 
