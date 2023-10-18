@@ -1,0 +1,12 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://purl.archive.org/socialweb/oauth"
+    ],
+    "type": "Application",
+    "name": "ap",
+    "summaryMap": {
+        "en": "ap command-line ActivityPub client"
+    },
+    "redirectURI": "https://localhost:63546/callback"
+}
