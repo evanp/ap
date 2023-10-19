@@ -35,6 +35,16 @@ def main():
     outbox_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
     outbox_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
 
+    create_parser = subparsers.add_parser('create', help='Create objects')
+    subsubparsers = create_parser.add_subparsers(dest='subsubcommand')
+    note_parser = subsubparsers.add_parser('note', help='Create a note')
+    note_parser.add_argument('content', nargs='+', help='Content of the note')
+    group = note_parser.add_mutually_exclusive_group()
+    group.add_argument('--private', action='store_true', default=True, help='Whether the note is private')
+    group.add_argument('--public', action='store_true', help='Whether the note is public')
+    group.add_argument('--followers-only', action='store_true', help='Whether the note is followers-only')
+    note_parser.add_argument('--to', type=str, nargs='+', help='Additional recipients')
+    note_parser.add_argument('--cc', type=str, nargs='+', help='Additional CC recipients')
     args = parser.parse_args()
 
     if args.subcommand == 'login':
@@ -45,6 +55,11 @@ def main():
         command = commands.InboxCommand(args)
     elif args.subcommand == 'outbox':
         command = commands.OutboxCommand(args)
+    elif args.subcommand == 'create':
+        if args.subsubcommand == 'note':
+            command = commands.CreateNoteCommand(args)
+        else:
+            raise Exception(f"Unknown subsubcommand: {args.subsubcommand}")
     else:
         raise Exception(f"Unknown command: {args.subcommand}")
 

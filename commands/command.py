@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 from requests_oauthlib import OAuth2Session
 from urllib.parse import urlparse
+import locale
 
 class Command:
 
@@ -57,7 +58,7 @@ class Command:
             if all(r in obj for r in required):
                 return obj
             elif 'id' in obj:
-                return self.get_object(obj[id])
+                return self.get_object(obj['id'])
             else:
                 raise Exception('Cannot satisfy requirements')
         elif isinstance(obj, str):
@@ -152,3 +153,34 @@ class Command:
                     page_id = self.to_id(page['next'])
                 else:
                     page_id = None
+
+    def do_activity(self, act):
+        actor = self.logged_in_actor()
+        if 'outbox' not in actor:
+            raise Exception('No outbox found')
+        outbox_id = self.to_id(actor['outbox'])
+        oauth = self.session()
+        headers = {
+            'Content-Type': 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'
+        }
+        data = {'@context': 'https://www.w3.org/ns/activitystreams',
+                **act}
+        r = oauth.post(outbox_id, headers=headers, data=json.dumps(data))
+        r.raise_for_status()
+        return r.json()
+
+    def text_prop(self, obj, name):
+        if name in obj:
+            return obj[name]
+        elif name + 'Map' in obj:
+            m = obj[name + 'Map']
+            current_locale, encoding = locale.getdefaultlocale()
+            language_code = current_locale[:2]
+            if language_code in m:
+                return m[language_code]
+            elif 'unk' in m:
+                return m['unk']
+            else:
+                return None
+        else:
+            return None

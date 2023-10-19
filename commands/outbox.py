@@ -25,9 +25,8 @@ class OutboxCommand(Command):
         rows = []
         for item in slice:
             id = self.to_id(item)
-            actor = self.to_webfinger(item['actor'], ['id', 'preferredUsername'])
             type = item.get('type', None)
             summary = self.text_prop(item, 'summary')
             published = item.get('published')
-            rows.append([id, actor, type, summary, published])
-        tabulate(rows, headers=['id', 'actor', 'type', 'summary', 'published'])
+            rows.append([id, type, summary, published])
+        print(tabulate(rows, headers=['id', 'type', 'summary', 'published']))
