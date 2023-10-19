@@ -1,10 +1,47 @@
 import requests
 import webfinger
+from pathlib import Path
+import json
+from requests_oauthlib import OAuth2Session
 
 class Command:
 
     def __init__(self, args):
         self.args = args
+        self._logged_in_actor = None
+        self._logged_in_actor_id = None
+        self._token_file_data = None
+        self._session = None
+
+    def logged_in_actor_id(self):
+        if self._logged_in_actor_id is None:
+            token = self.token_file_data()
+            self._logged_in_actor_id = token.get('actor_id', None)
+            if self._logged_in_actor_id is None:
+                raise Exception('Not logged in')
+        return self._logged_in_actor_id
+
+    def token_file_data(self):
+        if self._token_file_data is None:
+            token_file = Path.home() / '.ap' / 'token.json'
+            with open(token_file, 'r') as f:
+                self._token_file_data = json.loads(f.read())
+        return self._token_file_data
+
+    def logged_in_actor(self):
+        if self._logged_in_actor is None:
+            id = self.logged_in_actor_id()
+            oauth = self.session()
+            r = oauth.get(id)
+            r.raise_for_status()
+            self._logged_in_actor = r.json()
+        return self._logged_in_actor
+
+    def session(self):
+        if self._session is None:
+            token = self.token_file_data()
+            self._session = OAuth2Session(token=token)
+        return self._session
 
     def to_id(self, prop):
         if isinstance(prop, dict):
@@ -14,7 +51,7 @@ class Command:
         else:
             raise Exception('Invalid property type')
 
-    def get_actor(self, id):
+    def get_actor_id(self, id):
         if not id.startswith('https://'):
             if id.startswith('@'):
                 id = "acct:" + id[1:]
@@ -27,6 +64,9 @@ class Command:
             if len(matches) == 0:
                 raise Exception('No ActivityPub account found')
             id = matches[0]
+        return id
+
+    def get_public(self, id):
         headers = {
             'Accept': 'application/ld+json,application/activity+json,application/json'
         }

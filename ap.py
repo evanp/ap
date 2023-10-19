@@ -24,12 +24,17 @@ def main():
     login_parser = subparsers.add_parser('login', help='Log into an ActivityPub server')
     login_parser.add_argument('id', help='Webfinger or ActivityPub ID')
 
+    get_parser = subparsers.add_parser('get', help='Get an object by ID')
+    get_parser.add_argument('id', help='id of object to get')
+
     args = parser.parse_args()
 
     if args.subcommand == 'login':
         command = commands.LoginCommand(args)
+    elif args.subcommand == 'get':
+        command = commands.GetCommand(args)
     else:
-        print(f"Unknown command: {args.subcommand}")
+        raise Exception(f"Unknown command: {args.subcommand}")
 
     command.run()
 

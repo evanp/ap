@@ -60,8 +60,9 @@ class LoginCommand(Command):
         apdir = Path.home() / '.ap'
         if not apdir.exists():
             apdir.mkdir(700)
+        data = {'actor_id': self.actor_id, **token}
         with open(apdir / 'token.json', 'w') as f:
-            f.write(json.dumps(token))
+            f.write(json.dumps(data))
 
     def run(self):
         """Log into an ActivityPub server
@@ -71,7 +72,8 @@ class LoginCommand(Command):
                 ActivityPub ID or a webfinger address
         """
 
-        json = self.get_actor(self.id)
+        self.actor_id = self.get_actor_id(self.id)
+        json = self.get_public(self.actor_id)
 
         (auth_endpoint, token_endpoint) = self.oauth_endpoints(json)
 
