@@ -39,10 +39,10 @@ class CreateNoteCommand(Command):
 
         if self.to:
             for to in self.to:
-                act['to'].append(self.actor_id(to))
+                act['to'].append(self.get_actor_id(to))
         if self.cc:
             for cc in self.cc:
-                act['cc'].append(self.actor_id(cc))
+                act['cc'].append(self.get_actor_id(cc))
 
         result = self.do_activity(act)
 
