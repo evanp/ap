@@ -1,4 +1,3 @@
-from .login import login
-from .create import create_note
+from .login import LoginCommand
 
-__all__ = ['login', 'create_note']
+__all__ = ['LoginCommand']
