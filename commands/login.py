@@ -8,6 +8,7 @@ from requests_oauthlib import OAuth2Session
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import urllib
+import logging
 
 CLIENT_ID = 'https://evanp.github.io/ap/client.jsonld'
 REDIRECT_URI = 'http://localhost:63546/callback'
@@ -24,16 +25,13 @@ class LoginRedirectHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text/html')
             self.end_headers()
             self.wfile.write(b'<html><head><title>Success</title></head><body><p>You may now close this window.</p></body></html>')
-            self.wfile.close()
             LoginRedirectHandler.command.on_callback(urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query))
 
 class LoginCommand(Command):
 
-
     def __init__(self, args):
         super().__init__(args)
         self.id = args.id
-        print(self.id)
 
     def pkce(self):
         """Generate a PKCE code verifier and challenge
@@ -99,15 +97,24 @@ class LoginCommand(Command):
         server.server_close()
 
     def on_callback(self, qs):
-        if (self.state != qs['state'][0]):
-               raise Exception('State mismatch')
-        if (qs['error']):
-            error = qs['error'][0]
-            if (error == 'access_denied'):
+        state = qs.get('state', None)
+        if (state is None or self.state != state[0]):
+            raise Exception('State mismatch')
+        error = qs.get('error', None)
+        if (error is not None):
+            error_val = error[0]
+            if (error_val == 'access_denied'):
                 print('Access denied')
             else:
-                print(f'Error: {error}')
+                print(f'Error: {error_val}')
                 return
-        code = qs['code'][0]
-        token = self.oauth.fetch_token(self.token_endpoint, code=code, code_verifier=self.verifier)
+        codes = qs.get('code', None)
+        if codes is None:
+            raise Exception('No code found')
+        code = codes[0]
+        token = self.oauth.fetch_token(
+            self.token_endpoint,
+            code=code,
+            code_verifier=self.verifier,
+            include_client_id=True)
         self.save_token(token)

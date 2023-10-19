@@ -23,7 +23,6 @@ class Command:
             else:
                 id = "acct:" + id
             wf = webfinger.finger(id)
-            print(wf.links)
             matches = [l['href'] for l in wf.links if l['rel'] == 'self' and l['type'] == 'application/activity+json']
             if len(matches) == 0:
                 raise Exception('No ActivityPub account found')
