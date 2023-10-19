@@ -2,7 +2,7 @@ from .command import Command
 import itertools
 from tabulate import tabulate
 
-class InboxCommand(Command):
+class OutboxCommand(Command):
 
     def __init__(self, args):
         super().__init__(args)
@@ -13,12 +13,12 @@ class InboxCommand(Command):
         actor = self.logged_in_actor()
         if actor is None:
             raise Exception('Not logged in')
-        inbox = actor.get('inbox', None)
-        if inbox is None:
-            raise Exception('No inbox found')
-        inbox_id = self.to_id(inbox)
+        outbox = actor.get('outbox', None)
+        if outbox is None:
+            raise Exception('No outbox found')
+        outbox_id = self.to_id(outbox)
         slice = itertools.islice(
-            self.items(inbox_id),
+            self.items(outbox_id),
             self.offset,
             self.offset + self.limit
         )
