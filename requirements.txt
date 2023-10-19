@@ -2,3 +2,4 @@ requests
 webfinger
 oauthlib
 requests_oauthlib
+tabulate

@@ -3,6 +3,7 @@ import webfinger
 from pathlib import Path
 import json
 from requests_oauthlib import OAuth2Session
+from urllib.parse import urlparse
 
 class Command:
 
@@ -51,6 +52,25 @@ class Command:
         else:
             raise Exception('Invalid property type')
 
+    def to_object(self, obj, required=[]):
+        if isinstance(obj, dict):
+            if all(r in obj for r in required):
+                return obj
+            elif 'id' in obj:
+                return self.get_object(obj[id])
+            else:
+                raise Exception('Cannot satisfy requirements')
+        elif isinstance(obj, str):
+            return self.get_object(obj)
+        else:
+            raise Exception('Invalid property type')
+
+    def to_webfinger(self, obj):
+        obj = self.to_object(obj, ['id', 'preferredUsername'])
+        if 'id' not in obj or 'preferredUsername' not in obj:
+            raise Exception('Cannot format this as a webfinger')
+        return obj['preferredUsername'] + '@' + urlparse(obj['id']).netloc
+
     def get_actor_id(self, id):
         if not id.startswith('https://'):
             if id.startswith('@'):
@@ -74,13 +94,40 @@ class Command:
         r.raise_for_status()
         return r.json()
 
-    def items(self, url):
+    def get_object(self, id):
+        actor_id = self.logged_in_actor_id()
+        if actor_id is None:
+            raise Exception('Not logged in')
+        if (urlparse(id).netloc == urlparse(actor_id).netloc):
+            data = self.get_local(id)
+        else:
+            data = self.get_by_proxy(id)
+        return data
+
+    def get_local(self, id):
+        oauth = self.session()
         headers = {
             'Accept': 'application/ld+json,application/activity+json,application/json'
         }
-        r = requests.get(url, headers=headers)
+        r = oauth.get(id, headers=headers)
         r.raise_for_status()
-        coll = r.json()
+        return r.json()
+
+    def get_by_proxy(self, id):
+        actor = self.logged_in_actor()
+        endpoints = actor.get('endpoints', None)
+        if (endpoints is None):
+            raise Exception('No endpoints found')
+        proxyUrl = endpoints.get('proxyUrl', None)
+        if (proxyUrl is None):
+            raise Exception('No proxyUrl found')
+        oauth = self.session()
+        r = oauth.post(proxyUrl, data={'id': id})
+        r.raise_for_status()
+        return r.json()
+
+    def items(self, url):
+        coll = self.get_object(url)
         if coll.get('items', None) is not None:
             for item in coll['items']:
                 yield item
@@ -92,9 +139,7 @@ class Command:
         elif coll.get('first', None) is not None:
             page_id = self.to_id(coll['first'])
             while page_id is not None:
-                r = requests.get(page_id,headers=headers)
-                r.raise_for_status()
-                page = r.json()
+                page = self.get_object(page_id)
                 if page.get('items', None) is not None:
                     for item in page['items']:
                         yield item
