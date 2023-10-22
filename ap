@@ -42,6 +42,9 @@ def make_parser():
     following_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
     following_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
 
+    follow_parser = subparsers.add_parser('follow', help='Follow an actor')
+    follow_parser.add_argument('id', help='id of actor to follow')
+
     create_parser = subparsers.add_parser('create', help='Create objects')
     subsubparsers = create_parser.add_subparsers(dest='subsubcommand')
     note_parser = subsubparsers.add_parser('note', help='Create a note')
@@ -69,6 +72,7 @@ def get_command(args):
         'outbox': commands.OutboxCommand,
         'followers': commands.FollowersCommand,
         'following': commands.FollowingCommand,
+        'follow': commands.FollowCommand,
         'create': {
             'note': commands.CreateNoteCommand
         }

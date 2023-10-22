@@ -5,6 +5,7 @@ from .outbox import OutboxCommand
 from .create_note import CreateNoteCommand
 from .followers import FollowersCommand
 from .following import FollowingCommand
+from .follow import FollowCommand
 
 __all__ = [
     'LoginCommand',
@@ -13,5 +14,6 @@ __all__ = [
     'OutboxCommand',
     'CreateNoteCommand',
     'FollowersCommand',
-    'FollowingCommand'
+    'FollowingCommand',
+    'FollowCommand'
 ]
