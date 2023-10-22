@@ -10,23 +10,13 @@ class FollowersCommand(Command):
         self.limit = args.limit
 
     def run(self):
-        actor = self.logged_in_actor()
-        if actor is None:
-            raise Exception('Not logged in')
-        followers = actor.get('followers', None)
-        if followers is None:
-            raise Exception('No followers found')
-        followers_id = self.to_id(followers)
-        slice = itertools.islice(
-            self.items(followers_id),
-            self.offset,
-            self.offset + self.limit
-        )
+        coll = self.get_actor_collection('followers')
+        slice = self.collection_slice(coll, self.offset, self.limit)
         rows = []
         for item in slice:
-            activity = self.to_object(item, ['object'])
+            activity = self.to_object(item, ['actor'])
             follower = self.to_object(
-                activity['object'],
+                activity['actor'],
                 [ 'id',
                   'preferredUsername',
                   ['name', 'nameMap', 'summary', 'summaryMap'] ]

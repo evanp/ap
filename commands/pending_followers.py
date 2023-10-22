@@ -13,9 +13,9 @@ class PendingFollowersCommand(Command):
         slice = self.collection_slice(coll, self.offset, self.limit)
         rows = []
         for item in slice:
-            activity = self.to_object(item, ['object'])
+            activity = self.to_object(item, ['actor'])
             follower = self.to_object(
-                activity['object'],
+                activity['actor'],
                 [ 'id',
                   'preferredUsername',
                   ['name', 'nameMap', 'summary', 'summaryMap'] ]
