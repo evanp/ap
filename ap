@@ -34,6 +34,10 @@ def make_parser():
     outbox_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
     outbox_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
 
+    followers_parser = subparsers.add_parser('followers', help='Get followers')
+    followers_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
+    followers_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
+
     create_parser = subparsers.add_parser('create', help='Create objects')
     subsubparsers = create_parser.add_subparsers(dest='subsubcommand')
     note_parser = subsubparsers.add_parser('note', help='Create a note')
@@ -52,22 +56,30 @@ def get_command(args):
     """Get the command corresponding to the arguments"""
 
     command = None
+    entry = None
 
-    if args.subcommand == 'login':
-        command = commands.LoginCommand(args)
-    elif args.subcommand == 'get':
-        command = commands.GetCommand(args)
-    elif args.subcommand == 'inbox':
-        command = commands.InboxCommand(args)
-    elif args.subcommand == 'outbox':
-        command = commands.OutboxCommand(args)
-    elif args.subcommand == 'create':
-        if args.subsubcommand == 'note':
-            command = commands.CreateNoteCommand(args)
-        else:
-            raise Exception(f"Unknown subsubcommand: {args.subsubcommand}")
+    map = {
+        'login': commands.LoginCommand,
+        'get': commands.GetCommand,
+        'inbox': commands.InboxCommand,
+        'outbox': commands.OutboxCommand,
+        'followers': commands.FollowersCommand,
+        'create': {
+            'note': commands.CreateNoteCommand
+        }
+    }
+
+    if args.subcommand in map:
+        entry = map[args.subcommand]
+        if isinstance(entry, dict):
+            if args.subsubcommand in entry:
+                entry = entry[args.subsubcommand]
+            else:
+                raise Exception('Invalid subsubcommand')
     else:
-        raise Exception(f"Unknown command: {args.subcommand}")
+        raise Exception('Invalid subcommand')
+
+    command = entry(args)
 
     return command
 

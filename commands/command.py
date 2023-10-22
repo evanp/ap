@@ -55,7 +55,7 @@ class Command:
 
     def to_object(self, obj, required=[]):
         if isinstance(obj, dict):
-            if all(r in obj for r in required):
+            if all(r in obj for r in required if isinstance(r, str)) and all(any(opt in obj for opt in r) for r in required if isinstance(r, list)):
                 return obj
             elif 'id' in obj:
                 return self.get_object(obj['id'])
@@ -184,3 +184,9 @@ class Command:
                 return None
         else:
             return None
+
+    def to_text(self, obj):
+        text = self.text_prop(obj, 'name')
+        if text is None:
+            text = self.text_prop(obj, 'summary')
+        return text
