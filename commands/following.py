@@ -10,28 +10,20 @@ class FollowingCommand(Command):
         self.limit = args.limit
 
     def run(self):
-        actor = self.logged_in_actor()
-        if actor is None:
-            raise Exception('Not logged in')
-        following = actor.get('following', None)
-        if following is None:
-            raise Exception('No following found')
-        following_id = self.to_id(following)
-        slice = itertools.islice(
-            self.items(following_id),
-            self.offset,
-            self.offset + self.limit
-        )
+        coll = self.get_actor_collection('following')
+        slice = self.collection_slice(coll, self.offset, self.limit)
         rows = []
         for item in slice:
-            activity = self.to_object(item, ['object'])
+            activity = self.to_object(item, ['id', 'object', 'published'])
             followed = self.to_object(
                 activity['object'],
                 [ 'id',
                   'preferredUsername',
                   ['name', 'nameMap', 'summary', 'summaryMap'] ]
             )
+            activity_id = self.to_id(activity)
             id = self.to_webfinger(followed)
             name = self.to_text(followed)
-            rows.append([id, name])
-        print(tabulate(rows, headers=['id', 'name']))
+            published = activity['published'] if 'published' in activity else None
+            rows.append([activity_id, id, name, published])
+        print(tabulate(rows, headers=['activity', 'id', 'name', 'published']))
