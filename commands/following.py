@@ -2,7 +2,7 @@ from .command import Command
 import itertools
 from tabulate import tabulate
 
-class FollowersCommand(Command):
+class FollowingCommand(Command):
 
     def __init__(self, args):
         super().__init__(args)
@@ -13,25 +13,25 @@ class FollowersCommand(Command):
         actor = self.logged_in_actor()
         if actor is None:
             raise Exception('Not logged in')
-        followers = actor.get('followers', None)
-        if followers is None:
-            raise Exception('No followers found')
-        followers_id = self.to_id(followers)
+        following = actor.get('following', None)
+        if following is None:
+            raise Exception('No following found')
+        following_id = self.to_id(following)
         slice = itertools.islice(
-            self.items(followers_id),
+            self.items(following_id),
             self.offset,
             self.offset + self.limit
         )
         rows = []
         for item in slice:
             activity = self.to_object(item, ['object'])
-            follower = self.to_object(
+            followed = self.to_object(
                 activity['object'],
                 [ 'id',
                   'preferredUsername',
                   ['name', 'nameMap', 'summary', 'summaryMap'] ]
             )
-            id = self.to_webfinger(follower)
-            name = self.to_text(follower)
+            id = self.to_webfinger(followed)
+            name = self.to_text(followed)
             rows.append([id, name])
         print(tabulate(rows, headers=['id', 'name']))
