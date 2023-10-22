@@ -71,6 +71,11 @@ def make_parser():
     note_parser.add_argument('--to', type=str, nargs='+', help='Additional recipients')
     note_parser.add_argument('--cc', type=str, nargs='+', help='Additional CC recipients')
 
+    accept_parser = subparsers.add_parser('accept', help='Accept an activity')
+    accept_subparsers = accept_parser.add_subparsers(dest='subsubcommand')
+    accept_follower_parser = accept_subparsers.add_parser('follower', help='Accept a follower request')
+    accept_follower_parser.add_argument('id', help='id of follower to accept')
+
     return parser
 
 def get_command(args):
@@ -96,6 +101,9 @@ def get_command(args):
         'pending': {
             'followers': commands.PendingFollowersCommand,
             'following': commands.PendingFollowingCommand
+        },
+        'accept': {
+            'follower': commands.AcceptFollowerCommand
         }
     }
 
