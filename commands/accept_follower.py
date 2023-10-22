@@ -40,8 +40,6 @@ class AcceptFollowerCommand(Command):
             'to': [actor_id]
         }
 
-        print(act)
-
         self.do_activity(act)
 
         print('Accepted follower %s' % self.id)
