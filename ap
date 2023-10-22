@@ -45,6 +45,17 @@ def make_parser():
     follow_parser = subparsers.add_parser('follow', help='Follow an actor')
     follow_parser.add_argument('id', help='id of actor to follow')
 
+    pending_parser = subparsers.add_parser('pending', help='Get pending follow requests')
+    pending_subparsers = pending_parser.add_subparsers(dest='subsubcommand')
+
+    pending_followers_parser = pending_subparsers.add_parser('followers', help='Show pending incoming follow requests')
+    pending_followers_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
+    pending_followers_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
+
+    pending_following_parser = pending_subparsers.add_parser('following', help='Show pending outgoing follow requests')
+    pending_following_parser.add_argument('--offset', help='Offset to start at', default=0, type=int)
+    pending_following_parser.add_argument('--limit', help='Max items to get', default=10, type=int)
+
     create_parser = subparsers.add_parser('create', help='Create objects')
     subsubparsers = create_parser.add_subparsers(dest='subsubcommand')
     note_parser = subsubparsers.add_parser('note', help='Create a note')
@@ -75,6 +86,10 @@ def get_command(args):
         'follow': commands.FollowCommand,
         'create': {
             'note': commands.CreateNoteCommand
+        },
+        'pending': {
+            'followers': commands.PendingFollowersCommand,
+            'following': commands.PendingFollowingCommand
         }
     }
 

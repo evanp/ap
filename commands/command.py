@@ -5,6 +5,7 @@ import json
 from requests_oauthlib import OAuth2Session
 from urllib.parse import urlparse
 import locale
+import itertools
 
 class Command:
 
@@ -127,32 +128,31 @@ class Command:
         r.raise_for_status()
         return r.json()
 
-    def items(self, url):
-        coll = self.get_object(url)
-        if coll.get('items', None) is not None:
+    def items(self, obj):
+        coll = self.to_object(obj, [['items', 'orderedItems', 'first']])
+        if 'items' in coll:
             for item in coll['items']:
                 yield item
             return
-        elif coll.get('orderedItems', None) is not None:
+        elif 'orderedItems' in coll:
             for item in coll['orderedItems']:
                 yield item
             return
-        elif coll.get('first', None) is not None:
-            page_id = self.to_id(coll['first'])
-            while page_id is not None:
-                page = self.get_object(page_id)
-                if page.get('items', None) is not None:
+        elif 'first' in coll:
+            page = self.to_object(coll['first'], [['items', 'orderedItems']])
+            while page is not None:
+                if 'items' in page:
                     for item in page['items']:
                         yield item
-                elif page.get('orderedItems', None) is not None:
+                elif 'orderedItems' in page:
                     for item in page['orderedItems']:
                         yield item
                 else:
                     raise Exception('No items found in page')
-                if page.get('next', None) is not None:
-                    page_id = self.to_id(page['next'])
+                if 'next' in page:
+                    page = self.to_object(page['next'], [['items', 'orderedItems']])
                 else:
-                    page_id = None
+                    page = None
 
     def do_activity(self, act):
         actor = self.logged_in_actor()
@@ -190,3 +190,16 @@ class Command:
         if text is None:
             text = self.text_prop(obj, 'summary')
         return text
+
+    def get_actor_collection(self, prop):
+        actor = self.logged_in_actor()
+        if prop not in actor:
+            raise Exception('No ' + prop + ' found')
+        return actor[prop]
+
+    def collection_slice(self, coll, offset, limit):
+        return itertools.islice(
+            self.items(coll),
+            offset,
+            offset + limit
+        )
