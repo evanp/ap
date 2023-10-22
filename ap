@@ -10,14 +10,13 @@ Functions:
 import argparse
 import commands
 import requests
-from requests.sessions import Session
 
-# Create a session
-s = Session()
-s.verify = False
-requests.Session = lambda *args, **kwargs: s
+# Create the top-level parser
 
-def main():
+def make_parser():
+
+    """Create the top-level parser"""
+
     parser = argparse.ArgumentParser(description='ActivityPub command line client')
     subparsers = parser.add_subparsers(dest='subcommand')
 
@@ -45,7 +44,14 @@ def main():
     group.add_argument('--followers-only', action='store_true', help='Whether the note is followers-only')
     note_parser.add_argument('--to', type=str, nargs='+', help='Additional recipients')
     note_parser.add_argument('--cc', type=str, nargs='+', help='Additional CC recipients')
-    args = parser.parse_args()
+
+    return parser
+
+def get_command(args):
+
+    """Get the command corresponding to the arguments"""
+
+    command = None
 
     if args.subcommand == 'login':
         command = commands.LoginCommand(args)
@@ -62,6 +68,18 @@ def main():
             raise Exception(f"Unknown subsubcommand: {args.subsubcommand}")
     else:
         raise Exception(f"Unknown command: {args.subcommand}")
+
+    return command
+
+def main():
+
+    """Parse arguments and call corresponding commands"""
+
+    parser = make_parser()
+
+    args = parser.parse_args()
+
+    command = get_command(args)
 
     command.run()
 
