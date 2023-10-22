@@ -81,6 +81,11 @@ def make_parser():
     reject_follower_parser = reject_subparsers.add_parser('follower', help='Reject a follower request')
     reject_follower_parser.add_argument('id', help='id of follower to reject')
 
+    undo_parser = subparsers.add_parser('undo', help='Undo an activity')
+    undo_subparsers = undo_parser.add_subparsers(dest='subsubcommand')
+    undo_follow_parser = undo_subparsers.add_parser('follow', help='Undo a follow')
+    undo_follow_parser.add_argument('id', help='id of actor to stop following')
+
     return parser
 
 def get_command(args):
@@ -112,6 +117,9 @@ def get_command(args):
         },
         'reject': {
             'follower': commands.RejectFollowerCommand
+        },
+        'undo': {
+            'follow': commands.UndoFollowCommand
         }
     }
 

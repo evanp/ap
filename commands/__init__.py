@@ -12,6 +12,7 @@ from .logout import LogoutCommand
 from .whoami import WhoamiCommand
 from .accept_follower import AcceptFollowerCommand
 from .reject_follower import RejectFollowerCommand
+from .undo_follow import UndoFollowCommand
 
 __all__ = [
     'LoginCommand',
@@ -27,5 +28,6 @@ __all__ = [
     'LogoutCommand',
     'WhoamiCommand',
     'AcceptFollowerCommand',
-    'RejectFollowerCommand'
+    'RejectFollowerCommand',
+    'UndoFollowCommand'
 ]
