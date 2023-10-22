@@ -11,6 +11,7 @@ from .pending_following import PendingFollowingCommand
 from .logout import LogoutCommand
 from .whoami import WhoamiCommand
 from .accept_follower import AcceptFollowerCommand
+from .reject_follower import RejectFollowerCommand
 
 __all__ = [
     'LoginCommand',
@@ -25,5 +26,6 @@ __all__ = [
     'PendingFollowingCommand',
     'LogoutCommand',
     'WhoamiCommand',
-    'AcceptFollowerCommand'
+    'AcceptFollowerCommand',
+    'RejectFollowerCommand'
 ]

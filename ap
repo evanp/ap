@@ -76,6 +76,11 @@ def make_parser():
     accept_follower_parser = accept_subparsers.add_parser('follower', help='Accept a follower request')
     accept_follower_parser.add_argument('id', help='id of follower to accept')
 
+    reject_parser = subparsers.add_parser('reject', help='Reject an activity')
+    reject_subparsers = reject_parser.add_subparsers(dest='subsubcommand')
+    reject_follower_parser = reject_subparsers.add_parser('follower', help='Reject a follower request')
+    reject_follower_parser.add_argument('id', help='id of follower to reject')
+
     return parser
 
 def get_command(args):
@@ -104,6 +109,9 @@ def get_command(args):
         },
         'accept': {
             'follower': commands.AcceptFollowerCommand
+        },
+        'reject': {
+            'follower': commands.RejectFollowerCommand
         }
     }
 
