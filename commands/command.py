@@ -24,9 +24,12 @@ class Command:
                 raise Exception('Not logged in')
         return self._logged_in_actor_id
 
+    def token_file(self):
+        return Path.home() / '.ap' / 'token.json'
+
     def token_file_data(self):
         if self._token_file_data is None:
-            token_file = Path.home() / '.ap' / 'token.json'
+            token_file = self.token_file()
             with open(token_file, 'r') as f:
                 self._token_file_data = json.loads(f.read())
         return self._token_file_data

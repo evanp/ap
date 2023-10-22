@@ -8,6 +8,8 @@ from .following import FollowingCommand
 from .follow import FollowCommand
 from .pending_followers import PendingFollowersCommand
 from .pending_following import PendingFollowingCommand
+from .logout import LogoutCommand
+from .whoami import WhoamiCommand
 
 __all__ = [
     'LoginCommand',
@@ -19,5 +21,7 @@ __all__ = [
     'FollowingCommand',
     'FollowCommand',
     'PendingFollowersCommand',
-    'PendingFollowingCommand'
+    'PendingFollowingCommand',
+    'LogoutCommand',
+    'WhoamiCommand'
 ]

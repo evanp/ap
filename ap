@@ -23,6 +23,10 @@ def make_parser():
     login_parser = subparsers.add_parser('login', help='Log into an ActivityPub server')
     login_parser.add_argument('id', help='Webfinger or ActivityPub ID')
 
+    subparsers.add_parser('logout', help='Log out of the current session')
+
+    subparsers.add_parser('whoami', help='Show the current user')
+
     get_parser = subparsers.add_parser('get', help='Get an object by ID')
     get_parser.add_argument('id', help='id of object to get')
 
@@ -78,6 +82,8 @@ def get_command(args):
 
     map = {
         'login': commands.LoginCommand,
+        'logout': commands.LogoutCommand,
+        'whoami': commands.WhoamiCommand,
         'get': commands.GetCommand,
         'inbox': commands.InboxCommand,
         'outbox': commands.OutboxCommand,
