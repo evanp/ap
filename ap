@@ -86,6 +86,17 @@ def make_parser():
     undo_follow_parser = undo_subparsers.add_parser('follow', help='Undo a follow')
     undo_follow_parser.add_argument('id', help='id of actor to stop following')
 
+    upload_parser = subparsers.add_parser('upload', help='Upload a file')
+    upload_parser.add_argument('filename', help='file name to upload')
+    group = upload_parser.add_mutually_exclusive_group()
+    group.add_argument('--private', action='store_true', default=True, help='Whether the file is private')
+    group.add_argument('--public', action='store_true', help='Whether the file is public')
+    group.add_argument('--followers-only', action='store_true', help='Whether the file is followers-only')
+    upload_parser.add_argument('--to', type=str, nargs='+', help='Additional recipients')
+    upload_parser.add_argument('--cc', type=str, nargs='+', help='Additional CC recipients')
+    upload_parser.add_argument('--title', help='Title of the file')
+    upload_parser.add_argument('--description', help='Description of the file')
+    
     return parser
 
 def get_command(args):
@@ -120,7 +131,8 @@ def get_command(args):
         },
         'undo': {
             'follow': commands.UndoFollowCommand
-        }
+        },
+        'upload': commands.UploadCommand
     }
 
     if args.subcommand in map:

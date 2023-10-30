@@ -13,6 +13,7 @@ from .whoami import WhoamiCommand
 from .accept_follower import AcceptFollowerCommand
 from .reject_follower import RejectFollowerCommand
 from .undo_follow import UndoFollowCommand
+from .upload import UploadCommand
 
 __all__ = [
     'LoginCommand',
@@ -29,5 +30,6 @@ __all__ = [
     'WhoamiCommand',
     'AcceptFollowerCommand',
     'RejectFollowerCommand',
-    'UndoFollowCommand'
+    'UndoFollowCommand',
+    'UploadCommand',
 ]

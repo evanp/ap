@@ -15,6 +15,7 @@ class Command:
         self._logged_in_actor_id = None
         self._token_file_data = None
         self._session = None
+        self._language_code = None
 
     def logged_in_actor_id(self):
         if self._logged_in_actor_id is None:
@@ -177,8 +178,7 @@ class Command:
             return obj[name]
         elif name + 'Map' in obj:
             m = obj[name + 'Map']
-            current_locale, encoding = locale.getdefaultlocale()
-            language_code = current_locale[:2]
+            language_code = self.get_language_code()
             if language_code in m:
                 return m[language_code]
             elif 'unk' in m:
@@ -187,6 +187,12 @@ class Command:
                 return None
         else:
             return None
+
+    def get_language_code(self):
+        if not self._language_code:
+            current_locale, encoding = locale.getdefaultlocale()
+            self._language_code = current_locale[:2]
+        return self._language_code
 
     def to_text(self, obj):
         text = self.text_prop(obj, 'name')
