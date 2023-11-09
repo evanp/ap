@@ -1,35 +1,37 @@
-from .login import LoginCommand
-from .get import GetCommand
-from .inbox import InboxCommand
-from .outbox import OutboxCommand
+from .accept_follower import AcceptFollowerCommand
 from .create_note import CreateNoteCommand
+from .delete import DeleteCommand
+from .follow import FollowCommand
 from .followers import FollowersCommand
 from .following import FollowingCommand
-from .follow import FollowCommand
+from .get import GetCommand
+from .inbox import InboxCommand
+from .login import LoginCommand
+from .logout import LogoutCommand
+from .outbox import OutboxCommand
 from .pending_followers import PendingFollowersCommand
 from .pending_following import PendingFollowingCommand
-from .logout import LogoutCommand
-from .whoami import WhoamiCommand
-from .accept_follower import AcceptFollowerCommand
 from .reject_follower import RejectFollowerCommand
 from .undo_follow import UndoFollowCommand
 from .upload import UploadCommand
+from .whoami import WhoamiCommand
 
 __all__ = [
-    'LoginCommand',
-    'GetCommand',
-    'InboxCommand',
-    'OutboxCommand',
+    'AcceptFollowerCommand',
     'CreateNoteCommand',
+    'DeleteCommand',
+    'FollowCommand',
     'FollowersCommand',
     'FollowingCommand',
-    'FollowCommand',
+    'GetCommand',
+    'InboxCommand',
+    'LoginCommand',
+    'LogoutCommand',
+    'OutboxCommand',
     'PendingFollowersCommand',
     'PendingFollowingCommand',
-    'LogoutCommand',
-    'WhoamiCommand',
-    'AcceptFollowerCommand',
     'RejectFollowerCommand',
     'UndoFollowCommand',
     'UploadCommand',
+    'WhoamiCommand',
 ]

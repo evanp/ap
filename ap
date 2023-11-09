@@ -96,7 +96,11 @@ def make_parser():
     upload_parser.add_argument('--cc', type=str, nargs='+', help='Additional CC recipients')
     upload_parser.add_argument('--title', help='Title of the file')
     upload_parser.add_argument('--description', help='Description of the file')
-    
+
+    delete_parser = subparsers.add_parser('delete', help='Delete an object')
+    delete_parser.add_argument('id', help='id of object to delete')
+    delete_parser.add_argument('--force', action='store_true', help='Do not prompt for confirmation')
+
     return parser
 
 def get_command(args):
@@ -132,7 +136,8 @@ def get_command(args):
         'undo': {
             'follow': commands.UndoFollowCommand
         },
-        'upload': commands.UploadCommand
+        'upload': commands.UploadCommand,
+        'delete': commands.DeleteCommand
     }
 
     if args.subcommand in map:
