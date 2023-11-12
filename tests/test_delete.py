@@ -63,7 +63,7 @@ class TestDeleteCommand(unittest.TestCase):
     @patch('requests_oauthlib.OAuth2Session.post')
     @patch('requests_oauthlib.OAuth2Session.get', side_effect=mock_oauth_get)
     @patch('builtins.input', return_value='y')
-    def test_delete_with_confirmation(self, mock_input, mock_requests_get, mock_oauth_post, mock_file):
+    def test_delete_with_force(self, mock_input, mock_requests_get, mock_oauth_post, mock_file):
         args = Namespace(id=NOTE_ID, force=True)
         delete_cmd = DeleteCommand(args)
 
