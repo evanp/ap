@@ -109,9 +109,9 @@ class TestInboxCommand(unittest.TestCase):
     @patch('requests_oauthlib.OAuth2Session.get', side_effect=mock_oauth_get)
     def test_get_inbox(self, mock_requests_post, mock_requests_get, mock_file):
         args = Namespace(subcommand='inbox', limit=10, offset=0)
-        get_cmd = InboxCommand(args)
+        cmd = InboxCommand(args)
 
-        get_cmd.run()
+        cmd.run()
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
