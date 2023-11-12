@@ -9,7 +9,6 @@ Functions:
 
 import argparse
 import commands
-import requests
 
 # Create the top-level parser
 
