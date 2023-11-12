@@ -115,7 +115,7 @@ class TestFollowersCommand(unittest.TestCase):
     @patch('builtins.open', new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch('requests_oauthlib.OAuth2Session.post', side_effect=mock_oauth_post)
     @patch('requests_oauthlib.OAuth2Session.get', side_effect=mock_oauth_get)
-    def test_get_inbox(self, mock_requests_post, mock_requests_get, mock_file):
+    def test_followers(self, mock_requests_post, mock_requests_get, mock_file):
         args = Namespace(subcommand='followers', limit=10, offset=0)
         cmd = FollowersCommand(args)
 
