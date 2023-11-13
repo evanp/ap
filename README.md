@@ -26,6 +26,7 @@ I haven't pushed it to PyPI yet, so you'll have to install it from source:
 ```bash
 git clone https://github.com/evanp/ap.git
 cd ap
+python3 -m pip3 install -r requirements.txt
 ./ap --help
 ```
 
