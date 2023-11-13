@@ -2,8 +2,8 @@ from .command import Command
 import itertools
 from tabulate import tabulate
 
-class OutboxCommand(Command):
 
+class OutboxCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.offset = args.offset
@@ -12,21 +12,19 @@ class OutboxCommand(Command):
     def run(self):
         actor = self.logged_in_actor()
         if actor is None:
-            raise Exception('Not logged in')
-        outbox = actor.get('outbox', None)
+            raise Exception("Not logged in")
+        outbox = actor.get("outbox", None)
         if outbox is None:
-            raise Exception('No outbox found')
+            raise Exception("No outbox found")
         outbox_id = self.to_id(outbox)
         slice = itertools.islice(
-            self.items(outbox_id),
-            self.offset,
-            self.offset + self.limit
+            self.items(outbox_id), self.offset, self.offset + self.limit
         )
         rows = []
         for item in slice:
             id = self.to_id(item)
-            type = item.get('type', None)
-            summary = self.text_prop(item, 'summary')
-            published = item.get('published')
+            type = item.get("type", None)
+            summary = self.text_prop(item, "summary")
+            published = item.get("published")
             rows.append([id, type, summary, published])
-        print(tabulate(rows, headers=['id', 'type', 'summary', 'published']))
+        print(tabulate(rows, headers=["id", "type", "summary", "published"]))

@@ -1,7 +1,7 @@
 from .command import Command
 
-class DeleteCommand(Command):
 
+class DeleteCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.id = args.id
@@ -17,7 +17,7 @@ class DeleteCommand(Command):
         obj = self.get_object(self.id)
 
         if obj is None:
-            raise Exception(f'Object {self.id} not found')
+            raise Exception(f"Object {self.id} not found")
 
         name = self.to_text(obj)
 
@@ -25,15 +25,17 @@ class DeleteCommand(Command):
             name = f'a {obj["type"]} object'
 
         if not self.force:
-            prompt = f'Are you sure you want to delete {name} ({self.id}) [y/N]?'
+            prompt = f"Are you sure you want to delete {name} ({self.id}) [y/N]?"
             confirmation = input(prompt).lower()
-            if confirmation != 'y':
+            if confirmation != "y":
                 return
 
-        result = self.do_activity({
-            '@context': 'https://www.w3.org/ns/activitystreams',
-            'type': 'Delete',
-            'object': self.id
-        })
+        result = self.do_activity(
+            {
+                "@context": "https://www.w3.org/ns/activitystreams",
+                "type": "Delete",
+                "object": self.id,
+            }
+        )
 
-        print('Deleted.')
+        print("Deleted.")

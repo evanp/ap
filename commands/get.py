@@ -1,8 +1,8 @@
 from .command import Command
 import json
 
-class GetCommand(Command):
 
+class GetCommand(Command):
     def __init__(self, args):
         super().__init__(args)
         self.id = args.id
