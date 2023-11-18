@@ -7,7 +7,6 @@ import sys
 import requests
 from requests_oauthlib import OAuth2Session
 import json
-import ap
 
 ACTOR_ID = "https://social.example/users/evanp"
 UPDATE_ID = f"{ACTOR_ID}/update/1"
