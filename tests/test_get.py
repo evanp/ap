@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.get import GetCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -38,10 +38,7 @@ class TestGetCommand(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_get_note(self, mock_requests_get, mock_file):
-        args = Namespace(id=NOTE_ID, force=False)
-        get_cmd = GetCommand(args)
-
-        get_cmd.run()
+        run_command(["get", NOTE_ID], {})
 
         # Assertions
         mock_requests_get.assert_called_once()
