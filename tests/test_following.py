@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.following import FollowingCommand
+from ap.commands.following import FollowingCommand
 from argparse import Namespace
 import io
 import sys

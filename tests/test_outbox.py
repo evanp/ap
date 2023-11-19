@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.outbox import OutboxCommand
+from ap.commands.outbox import OutboxCommand
 from argparse import Namespace
 import io
 import sys

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.reject_follower import RejectFollowerCommand
+from ap.commands.reject_follower import RejectFollowerCommand
 from argparse import Namespace
 import io
 import sys

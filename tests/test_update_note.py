@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.update_note import UpdateNoteCommand
+from ap.commands.update_note import UpdateNoteCommand
 from argparse import Namespace
 import io
 import sys

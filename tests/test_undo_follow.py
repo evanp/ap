@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.undo_follow import UndoFollowCommand
+from ap.commands.undo_follow import UndoFollowCommand
 from argparse import Namespace
 import io
 import sys

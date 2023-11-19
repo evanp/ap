@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.pending_following import PendingFollowingCommand
+from ap.commands.pending_following import PendingFollowingCommand
 from argparse import Namespace
 import io
 import sys

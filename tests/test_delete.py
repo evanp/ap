@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from commands.delete import DeleteCommand
+from ap.commands.delete import DeleteCommand
 from argparse import Namespace
 import io
 import sys
