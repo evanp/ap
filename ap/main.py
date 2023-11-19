@@ -7,11 +7,12 @@ Functions:
     main(): Parses arguments and calls corresponding commands
 """
 
+import sys
+import os
 import argparse
 import ap.commands as commands
 
 # Create the top-level parser
-
 
 def make_parser():
     """Create the top-level parser"""
@@ -168,8 +169,9 @@ def make_parser():
 
     return parser
 
+parser = make_parser()
 
-def get_command(args):
+def get_command(args, env):
     """Get the command corresponding to the arguments"""
 
     command = None
@@ -212,17 +214,23 @@ def get_command(args):
 
     return command
 
+def run_command(argv, env=None):
+
+    """Run a command"""
+
+    if env is None:
+        env = os.environ
+
+    args = parser.parse_args(argv)
+
+    command = get_command(args, env)
+
+    command.run()
 
 def main():
     """Parse arguments and call corresponding commands"""
 
-    parser = make_parser()
-
-    args = parser.parse_args()
-
-    command = get_command(args)
-
-    command.run()
+    run_command(sys.argv[1:], os.environ)
 
 
 if __name__ == "__main__":
