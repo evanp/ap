@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.follow import FollowCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -78,10 +78,8 @@ class TestFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_follow_remote(self, mock_requests_get, mock_requests_post, mock_file):
-        args = Namespace(subcommand="follow", id=OTHER_1_ID)
-        cmd = FollowCommand(args)
 
-        cmd.run()
+        run_command(["follow", OTHER_1_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -92,10 +90,8 @@ class TestFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_follow_local(self, mock_requests_get, mock_requests_post, mock_file):
-        args = Namespace(subcommand="follow", id=OTHER_2_ID)
-        cmd = FollowCommand(args)
 
-        cmd.run()
+        run_command(["follow", OTHER_2_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
