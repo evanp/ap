@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.inbox import InboxCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -100,10 +100,7 @@ class TestInboxCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_inbox(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(subcommand="inbox", limit=10, offset=0)
-        cmd = InboxCommand(args)
-
-        cmd.run()
+        run_command(["inbox"], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
