@@ -105,9 +105,9 @@ def make_parser():
         action="store_true",
         help="Whether the note is followers-only",
     )
-    note_parser.add_argument("--to", type=str, nargs="+", help="Additional recipients")
+    note_parser.add_argument("--to", type=str, action='append', help="Additional recipients")
     note_parser.add_argument(
-        "--cc", type=str, nargs="+", help="Additional CC recipients"
+        "--cc", type=str, action='append', help="Additional CC recipients"
     )
 
     accept_parser = subparsers.add_parser("accept", help="Accept an activity")

@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.create_note import CreateNoteCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -64,19 +64,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_create_note_public(self, mock_requests_get, mock_requests_post, mock_file):
-        args = Namespace(
-            subcommand="create",
-            subsubcommand="note",
-            content=[CONTENT],
-            public=True,
-            private=False,
-            followers_only=False,
-            to=[],
-            cc=[],
-        )
-        cmd = CreateNoteCommand(args)
-
-        cmd.run()
+        run_command(["create", "note", "--public", CONTENT], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -90,19 +78,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     def test_create_note_followers_only(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        args = Namespace(
-            subcommand="create",
-            subsubcommand="note",
-            content=[CONTENT],
-            public=False,
-            private=False,
-            followers_only=True,
-            to=[],
-            cc=[],
-        )
-        cmd = CreateNoteCommand(args)
-
-        cmd.run()
+        run_command(["create", "note", "--followers-only", CONTENT], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -116,19 +92,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     def test_create_note_private(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        args = Namespace(
-            subcommand="create",
-            subsubcommand="note",
-            content=[CONTENT],
-            public=False,
-            private=True,
-            followers_only=False,
-            to=[OTHER_ID],
-            cc=[],
-        )
-        cmd = CreateNoteCommand(args)
-
-        cmd.run()
+        run_command(["create", "note", '--to', OTHER_ID, CONTENT], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
