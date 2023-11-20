@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.delete import DeleteCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -44,14 +44,12 @@ class TestDeleteCommand(unittest.TestCase):
     def test_delete_with_confirmation(
         self, mock_input, mock_requests_get, mock_oauth_post, mock_file
     ):
-        args = Namespace(id=NOTE_ID, force=False)
-        delete_cmd = DeleteCommand(args)
 
         mock_oauth_post.return_value = MagicMock(
             status_code=200, json=lambda: {"success": True}
         )
 
-        delete_cmd.run()
+        run_command(["delete", NOTE_ID], {})
 
         # Assertions
         self.assertEqual(mock_requests_get.call_count, 2)
@@ -66,14 +64,12 @@ class TestDeleteCommand(unittest.TestCase):
     def test_delete_with_force(
         self, mock_input, mock_requests_get, mock_oauth_post, mock_file
     ):
-        args = Namespace(id=NOTE_ID, force=True)
-        delete_cmd = DeleteCommand(args)
 
         mock_oauth_post.return_value = MagicMock(
             status_code=200, json=lambda: {"success": True}
         )
 
-        delete_cmd.run()
+        run_command(["delete", "--force", NOTE_ID], {})
 
         # Assertions
         self.assertEqual(mock_requests_get.call_count, 2)
