@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.outbox import OutboxCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -76,10 +76,7 @@ class TestOutboxCommand(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_outbox(self, mock_requests_get, mock_file):
-        args = Namespace(subcommand="outbox", limit=10, offset=0)
-        outbox_cmd = OutboxCommand(args)
-
-        outbox_cmd.run()
+        run_command(["outbox"], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
