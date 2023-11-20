@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.reject_follower import RejectFollowerCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -133,10 +133,7 @@ class TestRejectFollowerCommand(unittest.TestCase):
     def test_reject_follower_remote(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        args = Namespace(subcommand="reject", subsubcommand="follower", id=OTHER_1_ID)
-        cmd = RejectFollowerCommand(args)
-
-        cmd.run()
+        run_command(["reject", "follower", OTHER_1_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -149,10 +146,7 @@ class TestRejectFollowerCommand(unittest.TestCase):
     def test_reject_follower_local(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        args = Namespace(subcommand="reject", subsubcommand="follower", id=OTHER_2_ID)
-        cmd = RejectFollowerCommand(args)
-
-        cmd.run()
+        run_command(["reject", "follower", OTHER_2_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
