@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.update_note import UpdateNoteCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -89,15 +89,7 @@ class TestUpdateNoteCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_update_note(self, mock_requests_get, mock_requests_post, mock_file):
-        args = Namespace(
-            subcommand="update",
-            subsubcommand="note",
-            id=NOTE_ID,
-            content=[NEW_CONTENT],
-        )
-        cmd = UpdateNoteCommand(args)
-
-        cmd.run()
+        run_command(["update", "note", NOTE_ID, NEW_CONTENT], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
