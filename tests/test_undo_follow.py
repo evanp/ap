@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.undo_follow import UndoFollowCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -203,12 +203,7 @@ class TestUndoFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_follow_pending_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(
-            subcommand="undo", subsubcommand="follow", id=OTHER_1_ID
-        )
-        cmd = UndoFollowCommand(args)
-
-        cmd.run()
+        run_command(["undo", "follow", OTHER_1_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -219,12 +214,7 @@ class TestUndoFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_follow_pending_local(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(
-            subcommand="undo", subsubcommand="follow", id=OTHER_2_ID
-        )
-        cmd = UndoFollowCommand(args)
-
-        cmd.run()
+        run_command(["undo", "follow", OTHER_2_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -236,12 +226,7 @@ class TestUndoFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_follow_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(
-            subcommand="undo", subsubcommand="follow", id=OTHER_3_ID
-        )
-        cmd = UndoFollowCommand(args)
-
-        cmd.run()
+        run_command(["undo", "follow", OTHER_3_ID], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -252,12 +237,8 @@ class TestUndoFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_follow_local(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(
-            subcommand="undo", subsubcommand="follow", id=OTHER_4_ID
-        )
-        cmd = UndoFollowCommand(args)
+        run_command(["undo", "follow", OTHER_4_ID], {})
 
-        cmd.run()
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
