@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.whoami import WhoamiCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -35,10 +35,7 @@ class TestWhoamiCommand(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_whoami(self, mock_requests_get, mock_file):
-        args = Namespace(subcommand="whoami")
-        delete_cmd = WhoamiCommand(args)
-
-        delete_cmd.run()
+        run_command(["whoami"], {})
 
         # Assertions
         mock_requests_get.assert_called_once()
