@@ -1,4 +1,5 @@
 from .accept_follower import AcceptFollowerCommand
+from .create_collection import CreateCollectionCommand
 from .create_note import CreateNoteCommand
 from .delete import DeleteCommand
 from .follow import FollowCommand
@@ -19,6 +20,7 @@ from .update_note import UpdateNoteCommand
 
 __all__ = [
     "AcceptFollowerCommand",
+    "CreateCollectionCommand",
     "CreateNoteCommand",
     "DeleteCommand",
     "FollowCommand",

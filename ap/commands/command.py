@@ -195,8 +195,11 @@ class Command:
 
     def get_language_code(self):
         if not self._language_code:
-            current_locale, encoding = locale.getdefaultlocale()
-            self._language_code = current_locale[:2]
+            current_locale, _ = locale.getdefaultlocale()
+            if current_locale is None:
+                self._language_code = "unk"
+            else:
+                self._language_code = current_locale[:2]
         return self._language_code
 
     def to_text(self, obj):

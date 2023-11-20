@@ -88,6 +88,7 @@ def make_parser():
 
     create_parser = subparsers.add_parser("create", help="Create objects")
     subsubparsers = create_parser.add_subparsers(dest="subsubcommand")
+
     note_parser = subsubparsers.add_parser("note", help="Create a note")
     note_parser.add_argument("content", nargs="+", help="Content of the note")
     group = note_parser.add_mutually_exclusive_group()
@@ -107,6 +108,28 @@ def make_parser():
     )
     note_parser.add_argument("--to", type=str, action='append', help="Additional recipients")
     note_parser.add_argument(
+        "--cc", type=str, action='append', help="Additional CC recipients"
+    )
+
+    coll_parser = subsubparsers.add_parser("collection", help="Create a collection")
+    coll_parser.add_argument("name", nargs="+", help="Name of the collection")
+    coll_group = coll_parser.add_mutually_exclusive_group()
+    coll_group.add_argument(
+        "--private",
+        action="store_true",
+        default=True,
+        help="Whether the collection is private",
+    )
+    coll_group.add_argument(
+        "--public", action="store_true", help="Whether the collection is public"
+    )
+    coll_group.add_argument(
+        "--followers-only",
+        action="store_true",
+        help="Whether the collection is followers-only",
+    )
+    coll_parser.add_argument("--to", type=str, action='append', help="Additional recipients")
+    coll_parser.add_argument(
         "--cc", type=str, action='append', help="Additional CC recipients"
     )
 
@@ -187,7 +210,10 @@ def get_command(args, env):
         "followers": commands.FollowersCommand,
         "following": commands.FollowingCommand,
         "follow": commands.FollowCommand,
-        "create": {"note": commands.CreateNoteCommand},
+        "create": {
+            "note": commands.CreateNoteCommand,
+            "collection": commands.CreateCollectionCommand,
+        },
         "pending": {
             "followers": commands.PendingFollowersCommand,
             "following": commands.PendingFollowingCommand,
