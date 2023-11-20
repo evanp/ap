@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, mock_open, MagicMock
-from ap.commands.pending_followers import PendingFollowersCommand
+from ap.main import run_command
 from argparse import Namespace
 import io
 import sys
@@ -122,12 +122,7 @@ class TestPendingFollowersCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_pending_followers(self, mock_requests_post, mock_requests_get, mock_file):
-        args = Namespace(
-            subcommand="pending", subsubcommand="followers", limit=10, offset=0
-        )
-        cmd = PendingFollowersCommand(args)
-
-        cmd.run()
+        run_command(["pending", "followers"], {})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
