@@ -190,6 +190,10 @@ def make_parser():
     update_note_parser.add_argument("id", help="ID of the note to update")
     update_note_parser.add_argument("content", nargs="+", help="Content of the note")
 
+    add_parser = subparsers.add_parser("add", help="Add objects to collections")
+    add_parser.add_argument("--target", help="ID of the collection to add to")
+    add_parser.add_argument("id", action='append', help="ID of the object to add")
+
     return parser
 
 parser = make_parser()
@@ -224,6 +228,7 @@ def get_command(args, env):
         "upload": commands.UploadCommand,
         "delete": commands.DeleteCommand,
         "update": {"note": commands.UpdateNoteCommand},
+        "add": commands.AddCommand,
     }
 
     if args.subcommand in map:

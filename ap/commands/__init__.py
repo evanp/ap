@@ -17,9 +17,11 @@ from .undo_follow import UndoFollowCommand
 from .upload import UploadCommand
 from .whoami import WhoamiCommand
 from .update_note import UpdateNoteCommand
+from .add import AddCommand
 
 __all__ = [
     "AcceptFollowerCommand",
+    "AddCommand",
     "CreateCollectionCommand",
     "CreateNoteCommand",
     "DeleteCommand",
