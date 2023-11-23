@@ -75,7 +75,7 @@ class TestAdd(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
-    def test_accept_follower_remote(
+    def test_add(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
         run_command(["add", "--target", COLLECTION_ID, OBJECT_ID], {})
