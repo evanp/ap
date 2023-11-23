@@ -192,7 +192,11 @@ def make_parser():
 
     add_parser = subparsers.add_parser("add", help="Add objects to collections")
     add_parser.add_argument("--target", help="ID of the collection to add to")
-    add_parser.add_argument("id", action='append', help="ID of the object to add")
+    add_parser.add_argument("id", action='append', help="ID of the object(s) to add")
+
+    remove_parser = subparsers.add_parser("remove", help="Remove objects from collections")
+    remove_parser.add_argument("--target", help="ID of the collection to remove from")
+    remove_parser.add_argument("id", action='append', help="ID(s) of the object(s) to remove")
 
     return parser
 
@@ -229,6 +233,7 @@ def get_command(args, env):
         "delete": commands.DeleteCommand,
         "update": {"note": commands.UpdateNoteCommand},
         "add": commands.AddCommand,
+        "remove": commands.RemoveCommand,
     }
 
     if args.subcommand in map:

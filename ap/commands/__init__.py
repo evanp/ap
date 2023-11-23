@@ -18,6 +18,7 @@ from .upload import UploadCommand
 from .whoami import WhoamiCommand
 from .update_note import UpdateNoteCommand
 from .add import AddCommand
+from .remove import RemoveCommand
 
 __all__ = [
     "AcceptFollowerCommand",
@@ -36,6 +37,7 @@ __all__ = [
     "PendingFollowersCommand",
     "PendingFollowingCommand",
     "RejectFollowerCommand",
+    "RemoveCommand",
     "UndoFollowCommand",
     "UpdateNoteCommand",
     "UploadCommand",
