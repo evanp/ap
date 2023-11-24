@@ -21,6 +21,7 @@ from .add import AddCommand
 from .remove import RemoveCommand
 from .likes import LikesCommand
 from .version import VersionCommand
+from .like import LikeCommand
 
 __all__ = [
     "AcceptFollowerCommand",
@@ -46,4 +47,5 @@ __all__ = [
     "UploadCommand",
     "WhoamiCommand",
     "VersionCommand",
+    "LikeCommand",
 ]

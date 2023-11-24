@@ -205,6 +205,9 @@ def make_parser():
     )
     likes_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
 
+    like_parser = subparsers.add_parser("like", help="Like an object")
+    like_parser.add_argument("id", help="ID of the object to like")
+
     subparsers.add_parser("version", help="Show version information")
 
     return parser
@@ -245,6 +248,7 @@ def get_command(args, env):
         "remove": commands.RemoveCommand,
         "likes": commands.LikesCommand,
         "version": commands.VersionCommand,
+        "like": commands.LikeCommand,
     }
 
     if args.subcommand in map:
