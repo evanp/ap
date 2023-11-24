@@ -20,6 +20,7 @@ from .update_note import UpdateNoteCommand
 from .add import AddCommand
 from .remove import RemoveCommand
 from .likes import LikesCommand
+from .version import VersionCommand
 
 __all__ = [
     "AcceptFollowerCommand",
@@ -44,4 +45,5 @@ __all__ = [
     "UpdateNoteCommand",
     "UploadCommand",
     "WhoamiCommand",
+    "VersionCommand",
 ]
