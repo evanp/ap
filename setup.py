@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
+from ap.version import __version__
 
 setup(
     name='ap',
-    version='0.1.0-dev',
+    version=__version__,
     packages=find_packages(),
     entry_points={
         'console_scripts': [
