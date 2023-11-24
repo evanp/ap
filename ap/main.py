@@ -198,6 +198,13 @@ def make_parser():
     remove_parser.add_argument("--target", help="ID of the collection to remove from")
     remove_parser.add_argument("id", action='append', help="ID(s) of the object(s) to remove")
 
+    likes_parser = subparsers.add_parser("likes", help="Get likes of an object")
+    likes_parser.add_argument("id", help="ID of the object to get likes of")
+    likes_parser.add_argument(
+        "--offset", help="Offset to start at", default=0, type=int
+    )
+    likes_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
+
     return parser
 
 parser = make_parser()
@@ -234,6 +241,7 @@ def get_command(args, env):
         "update": {"note": commands.UpdateNoteCommand},
         "add": commands.AddCommand,
         "remove": commands.RemoveCommand,
+        "likes": commands.LikesCommand,
     }
 
     if args.subcommand in map:
