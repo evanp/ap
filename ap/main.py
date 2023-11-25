@@ -149,8 +149,12 @@ def make_parser():
 
     undo_parser = subparsers.add_parser("undo", help="Undo an activity")
     undo_subparsers = undo_parser.add_subparsers(dest="subsubcommand")
+
     undo_follow_parser = undo_subparsers.add_parser("follow", help="Undo a follow")
     undo_follow_parser.add_argument("id", help="id of actor to stop following")
+
+    undo_like_parser = undo_subparsers.add_parser("like", help="Undo a like")
+    undo_like_parser.add_argument("id", help="id of object to unlike")
 
     upload_parser = subparsers.add_parser("upload", help="Upload a file")
     upload_parser.add_argument("filename", help="file name to upload")
@@ -240,7 +244,10 @@ def get_command(args, env):
         },
         "accept": {"follower": commands.AcceptFollowerCommand},
         "reject": {"follower": commands.RejectFollowerCommand},
-        "undo": {"follow": commands.UndoFollowCommand},
+        "undo": {
+            "follow": commands.UndoFollowCommand,
+            "like": commands.UndoLikeCommand,
+        },
         "upload": commands.UploadCommand,
         "delete": commands.DeleteCommand,
         "update": {"note": commands.UpdateNoteCommand},
