@@ -214,6 +214,13 @@ def make_parser():
 
     subparsers.add_parser("version", help="Show version information")
 
+    shares_parser = subparsers.add_parser("shares", help="Get shares of an object")
+    shares_parser.add_argument("id", help="ID of the object to get shares of")
+    shares_parser.add_argument(
+        "--offset", help="Offset to start at", default=0, type=int
+    )
+    shares_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
+
     return parser
 
 parser = make_parser()
@@ -256,6 +263,7 @@ def get_command(args, env):
         "likes": commands.LikesCommand,
         "version": commands.VersionCommand,
         "like": commands.LikeCommand,
+        "shares": commands.SharesCommand,
     }
 
     if args.subcommand in map:
