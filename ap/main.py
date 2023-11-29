@@ -156,6 +156,9 @@ def make_parser():
     undo_like_parser = undo_subparsers.add_parser("like", help="Undo a like")
     undo_like_parser.add_argument("id", help="id of object to unlike")
 
+    undo_share_parser = undo_subparsers.add_parser("share", help="Undo a share")
+    undo_share_parser.add_argument("id", help="id of object to unshare")
+
     upload_parser = subparsers.add_parser("upload", help="Upload a file")
     upload_parser.add_argument("filename", help="file name to upload")
     group = upload_parser.add_mutually_exclusive_group()
@@ -257,6 +260,7 @@ def get_command(args, env):
         "undo": {
             "follow": commands.UndoFollowCommand,
             "like": commands.UndoLikeCommand,
+            "share": commands.UndoShareCommand,
         },
         "upload": commands.UploadCommand,
         "delete": commands.DeleteCommand,
