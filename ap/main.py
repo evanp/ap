@@ -221,6 +221,9 @@ def make_parser():
     )
     shares_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
 
+    share_parser = subparsers.add_parser("share", help="Share an object")
+    share_parser.add_argument("id", help="ID of the object to share")
+
     return parser
 
 parser = make_parser()
@@ -264,6 +267,7 @@ def get_command(args, env):
         "version": commands.VersionCommand,
         "like": commands.LikeCommand,
         "shares": commands.SharesCommand,
+        "share": commands.ShareCommand,
     }
 
     if args.subcommand in map:
