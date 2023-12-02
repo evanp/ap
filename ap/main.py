@@ -110,6 +110,7 @@ def make_parser():
     note_parser.add_argument(
         "--cc", type=str, action='append', help="Additional CC recipients"
     )
+    note_parser.add_argument('--in-reply-to', type=str, help="Object to reply to")
 
     coll_parser = subsubparsers.add_parser("collection", help="Create a collection")
     coll_parser.add_argument("name", nargs="+", help="Name of the collection")

@@ -11,16 +11,21 @@ class CreateNoteCommand(Command):
         self.private = args.private
         self.to = args.to
         self.cc = args.cc
+        self.in_reply_to = args.in_reply_to
 
     def run(self):
+        obj = {
+            "type": "Note",
+            "content": self.content,
+        }
+        if self.in_reply_to:
+            obj["inReplyTo"] = self.in_reply_to
+
         act = {
             "to": [],
             "cc": [],
             "type": "Create",
-            "object": {
-                "type": "Note",
-                "content": self.content,
-            },
+             "object": obj
         }
 
         if self.public:
