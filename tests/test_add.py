@@ -78,7 +78,7 @@ class TestAdd(unittest.TestCase):
     def test_add(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        run_command(["add", "--target", COLLECTION_ID, OBJECT_ID], {})
+        run_command(["add", "--target", COLLECTION_ID, OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

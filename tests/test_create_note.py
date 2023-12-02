@@ -64,7 +64,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_create_note_public(self, mock_requests_get, mock_requests_post, mock_file):
-        run_command(["create", "note", "--public", CONTENT], {})
+        run_command(["create", "note", "--public", CONTENT], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -78,7 +78,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     def test_create_note_followers_only(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        run_command(["create", "note", "--followers-only", CONTENT], {})
+        run_command(["create", "note", "--followers-only", CONTENT], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -92,7 +92,7 @@ class TestCreateNoteCommand(unittest.TestCase):
     def test_create_note_private(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        run_command(["create", "note", '--to', OTHER_ID, CONTENT], {})
+        run_command(["create", "note", '--to', OTHER_ID, CONTENT], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

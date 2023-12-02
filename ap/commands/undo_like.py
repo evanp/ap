@@ -2,8 +2,8 @@ from .command import Command
 
 class UndoLikeCommand(Command):
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
 
     def run(self):
@@ -25,7 +25,7 @@ class UndoLikeCommand(Command):
 
         if not found:
             raise Exception(f"Actor {actor_id} has not liked object {self.id}")
-            
+
         obj = self.get_object(self.id)
 
         if (obj is None):

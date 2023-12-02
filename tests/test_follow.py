@@ -79,7 +79,7 @@ class TestFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_follow_remote(self, mock_requests_get, mock_requests_post, mock_file):
 
-        run_command(["follow", OTHER_1_ID], {})
+        run_command(["follow", OTHER_1_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -91,7 +91,7 @@ class TestFollowCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_follow_local(self, mock_requests_get, mock_requests_post, mock_file):
 
-        run_command(["follow", OTHER_2_ID], {})
+        run_command(["follow", OTHER_2_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

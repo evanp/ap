@@ -77,7 +77,7 @@ class TestCreateCollectionCommand(unittest.TestCase):
         global posted
 
         posted = []
-        run_command(["create", "collection", "--public", NAME], {"LANG": "en_US.UTF-8"})
+        run_command(["create", "collection", "--public", NAME], {"LANG": "en_US.UTF-8", 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -96,7 +96,7 @@ class TestCreateCollectionCommand(unittest.TestCase):
     ):
         global posted
         posted = []
-        run_command(["create", "collection", "--followers-only", NAME], {"LANG": "en_US.UTF-8"})
+        run_command(["create", "collection", "--followers-only", NAME], {"LANG": "en_US.UTF-8", 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -116,7 +116,7 @@ class TestCreateCollectionCommand(unittest.TestCase):
         global posted
         posted = []
 
-        run_command(["create", "collection", '--to', OTHER_ID, NAME], {"LANG": "en_US.UTF-8"})
+        run_command(["create", "collection", '--to', OTHER_ID, NAME], {"LANG": "en_US.UTF-8", 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

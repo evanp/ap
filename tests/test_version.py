@@ -21,7 +21,7 @@ class TestVersionCommand(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     def test_version(self, mock_file):
-        run_command(["version"], {})
+        run_command(["version"], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         output = sys.stdout.getvalue()

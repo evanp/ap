@@ -3,8 +3,8 @@ from .command import Command
 class LikeCommand(Command):
     """Like an object"""
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
 
     def run(self):

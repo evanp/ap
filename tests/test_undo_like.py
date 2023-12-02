@@ -159,7 +159,7 @@ class TestUndoLikeCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_like_local(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["undo", "like", OBJECT_ID], {})
+        run_command(["undo", "like", OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -171,7 +171,7 @@ class TestUndoLikeCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_like_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["undo", "like", REMOTE_OBJECT_ID], {})
+        run_command(["undo", "like", REMOTE_OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -185,7 +185,7 @@ class TestUndoLikeCommand(unittest.TestCase):
     def test_undo_not_liked(self, mock_requests_post, mock_requests_get, mock_file):
 
         with self.assertRaises(Exception) as context:
-            run_command(["undo", "like", NOT_LIKED_ID], {})
+            run_command(["undo", "like", NOT_LIKED_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
 if __name__ == "__main__":
     unittest.main()

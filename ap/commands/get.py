@@ -3,8 +3,8 @@ import json
 
 
 class GetCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
 
     def run(self):

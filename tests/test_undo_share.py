@@ -159,7 +159,7 @@ class TestUndoShareCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_share_local(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["undo", "share", OBJECT_ID], {})
+        run_command(["undo", "share", OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -171,7 +171,7 @@ class TestUndoShareCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_undo_share_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["undo", "share", REMOTE_OBJECT_ID], {})
+        run_command(["undo", "share", REMOTE_OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -185,7 +185,7 @@ class TestUndoShareCommand(unittest.TestCase):
     def test_undo_not_shared(self, mock_requests_post, mock_requests_get, mock_file):
 
         with self.assertRaises(Exception) as context:
-            run_command(["undo", "share", NOT_SHARED_ID], {})
+            run_command(["undo", "share", NOT_SHARED_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
 if __name__ == "__main__":
     unittest.main()

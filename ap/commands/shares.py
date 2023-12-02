@@ -3,8 +3,8 @@ from tabulate import tabulate
 
 class SharesCommand(Command):
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
         self.offset = args.offset
         self.limit = args.limit

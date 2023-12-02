@@ -3,8 +3,8 @@ import json
 
 
 class CreateNoteCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.content = " ".join(args.content)
         self.public = args.public
         self.followers_only = args.followers_only

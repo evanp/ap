@@ -227,6 +227,13 @@ def make_parser():
     share_parser = subparsers.add_parser("share", help="Share an object")
     share_parser.add_argument("id", help="ID of the object to share")
 
+    replies_parser = subparsers.add_parser("replies", help="Get replies of an object")
+    replies_parser.add_argument("id", help="ID of the object to get replies of")
+    replies_parser.add_argument(
+        "--offset", help="Offset to start at", default=0, type=int
+    )
+    replies_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
+
     return parser
 
 parser = make_parser()
@@ -272,6 +279,7 @@ def get_command(args, env):
         "like": commands.LikeCommand,
         "shares": commands.SharesCommand,
         "share": commands.ShareCommand,
+        "replies": commands.RepliesCommand
     }
 
     if args.subcommand in map:
@@ -284,7 +292,7 @@ def get_command(args, env):
     else:
         raise Exception("Invalid subcommand")
 
-    command = entry(args)
+    command = entry(args, env)
 
     return command
 

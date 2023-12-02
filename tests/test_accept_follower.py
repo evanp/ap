@@ -133,7 +133,7 @@ class TestAcceptFollowerCommand(unittest.TestCase):
     def test_accept_follower_remote(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        run_command(["accept", "follower", OTHER_1_ID], {})
+        run_command(["accept", "follower", OTHER_1_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -146,7 +146,7 @@ class TestAcceptFollowerCommand(unittest.TestCase):
     def test_accept_follower_local(
         self, mock_requests_get, mock_requests_post, mock_file
     ):
-        run_command(["accept", "follower", OTHER_2_ID], {})
+        run_command(["accept", "follower", OTHER_2_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

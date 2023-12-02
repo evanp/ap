@@ -4,13 +4,13 @@ from pathlib import Path
 import json
 from requests_oauthlib import OAuth2Session
 from urllib.parse import urlparse
-import locale
 import itertools
 
 
 class Command:
-    def __init__(self, args):
+    def __init__(self, args, env):
         self.args = args
+        self.env = env
         self._logged_in_actor = None
         self._logged_in_actor_id = None
         self._token_file_data = None
@@ -26,7 +26,8 @@ class Command:
         return self._logged_in_actor_id
 
     def token_file(self):
-        return Path.home() / ".ap" / "token.json"
+        home = self.env.get('HOME')
+        return Path(home) / ".ap" / "token.json"
 
     def token_file_data(self):
         if self._token_file_data is None:
@@ -184,6 +185,8 @@ class Command:
         elif name + "Map" in obj:
             m = obj[name + "Map"]
             language_code = self.get_language_code()
+            if language_code is None:
+                raise Exception('No language code')
             if language_code in m:
                 return m[language_code]
             elif "unk" in m:
@@ -195,11 +198,13 @@ class Command:
 
     def get_language_code(self):
         if not self._language_code:
-            current_locale, _ = locale.getdefaultlocale()
+            lang = self.env.get('LANG')
+            if lang is None:
+                raise Exception('No language code set')
+            current_locale, _ = lang.split('.')
             if current_locale is None:
-                self._language_code = "unk"
-            else:
-                self._language_code = current_locale[:2]
+                raise Exception(f'No current_locale')
+            self._language_code = current_locale[:2]
         return self._language_code
 
     def to_text(self, obj):
