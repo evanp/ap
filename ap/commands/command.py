@@ -128,12 +128,7 @@ class Command:
 
     def get_by_proxy(self, id):
         actor = self.logged_in_actor()
-        endpoints = actor.get("endpoints", None)
-        if endpoints is None:
-            raise Exception("No endpoints found")
-        proxyUrl = endpoints.get("proxyUrl", None)
-        if proxyUrl is None:
-            raise Exception("No proxyUrl found")
+        proxyUrl = self.get_endpoint(actor, "proxyUrl")
         oauth = self.session()
         r = oauth.post(proxyUrl, data={"id": id})
         r.raise_for_status()
@@ -218,6 +213,19 @@ class Command:
         if prop not in actor:
             raise Exception("No " + prop + " found")
         return actor[prop]
+
+    def get_endpoint(self, actor, prop):
+        if "endpoints" not in actor:
+            raise Exception("No endpoints found")
+        endpoints = actor["endpoints"]
+        if type(endpoints) == str:
+            # Technically allowed by AP spec
+            endpoints = self.get_object(endpoints)
+        if type(endpoints) != dict:
+            raise Exception("Invalid endpoints")
+        if prop not in endpoints:
+            raise Exception("No " + prop + " found")
+        return endpoints[prop]
 
     def collection_slice(self, coll, offset, limit):
         return itertools.islice(self.items(coll), offset, offset + limit)
