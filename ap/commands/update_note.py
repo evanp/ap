@@ -2,8 +2,8 @@ from .command import Command
 import json
 
 class UpdateNoteCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
         self.content = args.content
 

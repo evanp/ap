@@ -189,7 +189,7 @@ class TestLikesCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_shares_local(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["shares", OBJECT_ID], {})
+        run_command(["shares", OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
@@ -205,7 +205,7 @@ class TestLikesCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_shares_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["shares", REMOTE_OBJECT_ID], {})
+        run_command(["shares", REMOTE_OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

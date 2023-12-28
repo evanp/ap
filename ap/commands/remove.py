@@ -3,8 +3,8 @@ from .command import Command
 class RemoveCommand(Command):
     """Remove an object from a collection."""
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.target = args.target
         self.id = args.id
 

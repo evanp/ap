@@ -5,8 +5,8 @@ import json
 
 
 class UploadCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.filename = args.filename
         self.title = args.title
         self.description = args.description

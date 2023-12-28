@@ -4,8 +4,8 @@ import json
 class CreateCollectionCommand(Command):
     """Create a new collection"""
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.name = args.name
         self.public = args.public
         self.followers_only = args.followers_only

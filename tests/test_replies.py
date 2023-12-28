@@ -11,19 +11,19 @@ import json
 ACTOR_ID = "https://social.example/users/evanp"
 OTHER_ID = "https://social.example/users/other"
 OBJECT_ID = f"{OTHER_ID}/objects/1"
-LIKES_ID = f"{OBJECT_ID}/likes"
+REPLIES_ID = f"{OBJECT_ID}/replies"
 REMOTE_ID = "https://remote.example/users/other"
 REMOTE_OBJECT_ID = f"{REMOTE_ID}/objects/1"
-REMOTE_LIKES_ID = f"{REMOTE_OBJECT_ID}/likes"
+REMOTE_REPLIES_ID = f"{REMOTE_OBJECT_ID}/replies"
 
 ANOTHER_ACTOR_ID = "https://social.example/users/another"
 AND_ANOTHER_ACTOR_ID = "https://social.example/users/andanother"
 
-LIKE_1_ID = f"{ANOTHER_ACTOR_ID}/likes/1"
-LIKE_2_ID = f"{AND_ANOTHER_ACTOR_ID}/likes/2"
-LIKE_3_ID = f"{ACTOR_ID}/likes/3"
-LIKE_4_ID = f"{OTHER_ID}/likes/4"
-LIKE_5_ID = f"{REMOTE_ID}/likes/5"
+REPLY_1_ID = f"{ANOTHER_ACTOR_ID}/objects/1"
+REPLY_2_ID = f"{AND_ANOTHER_ACTOR_ID}/objects/2"
+REPLY_3_ID = f"{ACTOR_ID}/objects/3"
+REPLY_4_ID = f"{OTHER_ID}/objects/4"
+REPLY_5_ID = f"{REMOTE_ID}/objects/5"
 
 ACTOR = {
     "type": "Person",
@@ -42,9 +42,11 @@ OTHER = {
 OBJECT = {
     "type": "Note",
     "id": OBJECT_ID,
-    "likes": LIKES_ID,
+    "replies": REPLIES_ID,
     "attributedTo": OTHER_ID,
-    "content": "This is a note",
+    "contentMap": {
+        "en": "This is a note"
+    }
 }
 
 ANOTHER_ACTOR = {
@@ -59,55 +61,70 @@ AND_ANOTHER_ACTOR = {
     "preferredUsername": "andanother",
 }
 
-LIKE_1 = {
-    "type": "Like",
-    "id": LIKE_1_ID,
-    "object": OBJECT_ID,
-    "actor": ANOTHER_ACTOR_ID,
+REPLY_1 = {
+    "type": "Note",
+    "id": REPLY_1_ID,
+    "inReplyTo": OBJECT_ID,
+    "attributedTo": ANOTHER_ACTOR_ID,
+    "contentMap": {
+        "en": "You're doing it wrong."
+    },
     "published": "2020-01-01T00:00:00Z",
 }
 
-LIKE_2 = {
-    "type": "Like",
-    "id": LIKE_2_ID,
-    "object": REMOTE_OBJECT_ID,
-    "actor": AND_ANOTHER_ACTOR_ID,
+REPLY_2 = {
+    "type": "Note",
+    "id": REPLY_2_ID,
+    "inReplyTo": REMOTE_OBJECT_ID,
+    "attributedTo": AND_ANOTHER_ACTOR_ID,
+    "contentMap": {
+        "en": "You're doing it wrong."
+    },
     "published": "2020-01-01T00:00:00Z",
 }
 
-LIKE_3 = {
-    "type": "Like",
-    "id": LIKE_3_ID,
-    "object": OBJECT_ID,
-    "actor": ACTOR_ID,
+REPLY_3 = {
+    "type": "Note",
+    "id": REPLY_3_ID,
+    "inReplyTo": OBJECT_ID,
+    "attributedTo": ACTOR_ID,
+    "contentMap": {
+        "en": "You're doing it wrong."
+    },
     "published": "2020-01-01T00:00:00Z",
 }
 
-LIKE_4 = {
-    "type": "Like",
-    "id": LIKE_4_ID,
-    "object": REMOTE_OBJECT_ID,
-    "actor": OTHER_ID,
+REPLY_4 = {
+    "type": "Note",
+    "id": REPLY_4_ID,
+    "inReplyTo": REMOTE_OBJECT_ID,
+    "attributedTo": OTHER_ID,
+    "contentMap": {
+        "en": "You're doing it wrong."
+    },
     "published": "2020-01-01T00:00:00Z",
 }
 
-LIKE_5 = {
-    "type": "Like",
-    "id": LIKE_5_ID,
-    "object": OBJECT_ID,
-    "actor": REMOTE_ID,
+REPLY_5 = {
+    "type": "Note",
+    "id": REPLY_5_ID,
+    "inReplyTo": OBJECT_ID,
+    "attributedTo": REMOTE_ID,
+    "contentMap": {
+        "en": "You're doing it wrong."
+    },
     "published": "2020-01-01T00:00:00Z",
 }
 
-LIKES = {
-    "id": LIKES_ID,
+REPLIES = {
+    "id": REPLIES_ID,
     "attributedTo": OTHER_ID,
     "type": "Collection",
     "totalItems": 3,
     "items": [
-        LIKE_1_ID,
-        LIKE_3_ID,
-        LIKE_5_ID,
+        REPLY_1_ID,
+        REPLY_3_ID,
+        REPLY_5_ID,
     ]
 }
 
@@ -121,17 +138,17 @@ REMOTE_OBJECT = {
     "type": "Object",
     "id": REMOTE_OBJECT_ID,
     "attributedTo": REMOTE_ID,
-    "likes": REMOTE_LIKES_ID,
+    "replies": REMOTE_REPLIES_ID,
 }
 
-REMOTE_LIKES = {
-    "id": REMOTE_LIKES_ID,
+REMOTE_REPLIES = {
+    "id": REMOTE_REPLIES_ID,
     "attributedTo": REMOTE_ID,
     "type": "Collection",
     "totalItems": 2,
     "items": [
-        LIKE_2_ID,
-        LIKE_4_ID,
+        REPLY_2_ID,
+        REPLY_4_ID,
     ]
 }
 
@@ -144,16 +161,16 @@ def mock_oauth_get(url, headers=None):
         return MagicMock(status_code=200, json=lambda: OTHER)
     elif url == OBJECT_ID:
         return MagicMock(status_code=200, json=lambda: OBJECT)
-    elif url == LIKES_ID:
-        return MagicMock(status_code=200, json=lambda: LIKES)
-    elif url == LIKE_1_ID:
-        return MagicMock(status_code=200, json=lambda: LIKE_1)
-    elif url == LIKE_2_ID:
-        return MagicMock(status_code=200, json=lambda: LIKE_2)
-    elif url == LIKE_3_ID:
-        return MagicMock(status_code=200, json=lambda: LIKE_3)
-    elif url == LIKE_4_ID:
-        return MagicMock(status_code=200, json=lambda: LIKE_4)
+    elif url == REPLIES_ID:
+        return MagicMock(status_code=200, json=lambda: REPLIES)
+    elif url == REPLY_1_ID:
+        return MagicMock(status_code=200, json=lambda: REPLY_1)
+    elif url == REPLY_2_ID:
+        return MagicMock(status_code=200, json=lambda: REPLY_2)
+    elif url == REPLY_3_ID:
+        return MagicMock(status_code=200, json=lambda: REPLY_3)
+    elif url == REPLY_4_ID:
+        return MagicMock(status_code=200, json=lambda: REPLY_4)
     elif url == ANOTHER_ACTOR_ID:
         return MagicMock(status_code=200, json=lambda: ANOTHER_ACTOR)
     elif url == AND_ANOTHER_ACTOR_ID:
@@ -168,17 +185,17 @@ def mock_oauth_post(url, headers=None, data=None):
             return MagicMock(status_code=200, json=lambda: REMOTE)
         if data["id"] == REMOTE_OBJECT_ID:
             return MagicMock(status_code=200, json=lambda: REMOTE_OBJECT)
-        if data["id"] == REMOTE_LIKES_ID:
-            return MagicMock(status_code=200, json=lambda: REMOTE_LIKES)
-        if data["id"] == LIKE_5_ID:
-            return MagicMock(status_code=200, json=lambda: LIKE_5)
+        if data["id"] == REMOTE_REPLIES_ID:
+            return MagicMock(status_code=200, json=lambda: REMOTE_REPLIES)
+        if data["id"] == REPLY_5_ID:
+            return MagicMock(status_code=200, json=lambda: REPLY_5)
         else:
             return MagicMock(status_code=404)
     else:
         return MagicMock(status_code=404)
 
 
-class TestLikesCommand(unittest.TestCase):
+class TestRepliesCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
 
@@ -188,34 +205,38 @@ class TestLikesCommand(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
-    def test_likes_local(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["likes", OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+    def test_replies_local(self, mock_requests_post, mock_requests_get, mock_file):
+        run_command(["replies", OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
         self.assertGreaterEqual(mock_requests_post.call_count, 1)
         output = sys.stdout.getvalue()
-        self.assertIn(LIKE_1_ID, output)
-        self.assertIn(LIKE_3_ID, output)
-        self.assertIn(LIKE_5_ID, output)
-        self.assertNotIn(LIKE_2_ID, output)
-        self.assertNotIn(LIKE_4_ID, output)
+        self.assertIn(REPLY_1_ID, output)
+        self.assertIn(REPLY_3_ID, output)
+        self.assertIn(REPLY_5_ID, output)
+        self.assertNotIn(REPLY_2_ID, output)
+        self.assertNotIn(REPLY_4_ID, output)
+        self.assertIn("another@social.example", output)
+        self.assertIn(REPLY_3["contentMap"]["en"], output)
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
-    def test_likes_remote(self, mock_requests_post, mock_requests_get, mock_file):
-        run_command(["likes", REMOTE_OBJECT_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+    def test_replies_remote(self, mock_requests_post, mock_requests_get, mock_file):
+        run_command(["replies", REMOTE_OBJECT_ID], {'LANG':  'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
         self.assertGreaterEqual(mock_requests_post.call_count, 1)
         output = sys.stdout.getvalue()
-        self.assertNotIn(LIKE_1_ID, output)
-        self.assertNotIn(LIKE_3_ID, output)
-        self.assertNotIn(LIKE_5_ID, output)
-        self.assertIn(LIKE_2_ID, output)
-        self.assertIn(LIKE_4_ID, output)
+        self.assertNotIn(REPLY_1_ID, output)
+        self.assertNotIn(REPLY_3_ID, output)
+        self.assertNotIn(REPLY_5_ID, output)
+        self.assertIn(REPLY_2_ID, output)
+        self.assertIn(REPLY_4_ID, output)
+        self.assertIn("andanother@social.example", output)
+        self.assertIn(REPLY_4["contentMap"]["en"], output)
 
 
 if __name__ == "__main__":

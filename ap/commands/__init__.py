@@ -24,6 +24,9 @@ from .version import VersionCommand
 from .like import LikeCommand
 from .undo_like import UndoLikeCommand
 from .shares import SharesCommand
+from .share import ShareCommand
+from .undo_share import UndoShareCommand
+from .replies import RepliesCommand
 
 __all__ = [
     "AcceptFollowerCommand",
@@ -51,5 +54,8 @@ __all__ = [
     "VersionCommand",
     "LikeCommand",
     "UndoLikeCommand",
-    "SharesCommand"
+    "SharesCommand",
+    "ShareCommand",
+    "UndoShareCommand",
+    "RepliesCommand"
 ]

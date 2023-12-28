@@ -35,7 +35,7 @@ class TestWhoamiCommand(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_whoami(self, mock_requests_get, mock_file):
-        run_command(["whoami"], {})
+        run_command(["whoami"], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         mock_requests_get.assert_called_once()

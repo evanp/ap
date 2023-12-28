@@ -89,7 +89,7 @@ class TestUpdateNoteCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_update_note(self, mock_requests_get, mock_requests_post, mock_file):
-        run_command(["update", "note", NOTE_ID, NEW_CONTENT], {})
+        run_command(["update", "note", NOTE_ID, NEW_CONTENT], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)

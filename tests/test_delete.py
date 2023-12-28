@@ -49,7 +49,7 @@ class TestDeleteCommand(unittest.TestCase):
             status_code=200, json=lambda: {"success": True}
         )
 
-        run_command(["delete", NOTE_ID], {})
+        run_command(["delete", NOTE_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertEqual(mock_requests_get.call_count, 2)
@@ -69,7 +69,7 @@ class TestDeleteCommand(unittest.TestCase):
             status_code=200, json=lambda: {"success": True}
         )
 
-        run_command(["delete", "--force", NOTE_ID], {})
+        run_command(["delete", "--force", NOTE_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertEqual(mock_requests_get.call_count, 2)

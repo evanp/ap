@@ -110,6 +110,7 @@ def make_parser():
     note_parser.add_argument(
         "--cc", type=str, action='append', help="Additional CC recipients"
     )
+    note_parser.add_argument('--in-reply-to', type=str, help="Object to reply to")
 
     coll_parser = subsubparsers.add_parser("collection", help="Create a collection")
     coll_parser.add_argument("name", nargs="+", help="Name of the collection")
@@ -155,6 +156,9 @@ def make_parser():
 
     undo_like_parser = undo_subparsers.add_parser("like", help="Undo a like")
     undo_like_parser.add_argument("id", help="id of object to unlike")
+
+    undo_share_parser = undo_subparsers.add_parser("share", help="Undo a share")
+    undo_share_parser.add_argument("id", help="id of object to unshare")
 
     upload_parser = subparsers.add_parser("upload", help="Upload a file")
     upload_parser.add_argument("filename", help="file name to upload")
@@ -221,6 +225,16 @@ def make_parser():
     )
     shares_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
 
+    share_parser = subparsers.add_parser("share", help="Share an object")
+    share_parser.add_argument("id", help="ID of the object to share")
+
+    replies_parser = subparsers.add_parser("replies", help="Get replies of an object")
+    replies_parser.add_argument("id", help="ID of the object to get replies of")
+    replies_parser.add_argument(
+        "--offset", help="Offset to start at", default=0, type=int
+    )
+    replies_parser.add_argument("--limit", help="Max items to get", default=10, type=int)
+
     return parser
 
 parser = make_parser()
@@ -254,6 +268,7 @@ def get_command(args, env):
         "undo": {
             "follow": commands.UndoFollowCommand,
             "like": commands.UndoLikeCommand,
+            "share": commands.UndoShareCommand,
         },
         "upload": commands.UploadCommand,
         "delete": commands.DeleteCommand,
@@ -264,6 +279,8 @@ def get_command(args, env):
         "version": commands.VersionCommand,
         "like": commands.LikeCommand,
         "shares": commands.SharesCommand,
+        "share": commands.ShareCommand,
+        "replies": commands.RepliesCommand
     }
 
     if args.subcommand in map:
@@ -276,7 +293,7 @@ def get_command(args, env):
     else:
         raise Exception("Invalid subcommand")
 
-    command = entry(args)
+    command = entry(args, env)
 
     return command
 

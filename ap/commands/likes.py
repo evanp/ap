@@ -4,8 +4,8 @@ from tabulate import tabulate
 class LikesCommand(Command):
     """`likes` command"""
 
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
         self.limit = args.limit
         self.offset = args.offset

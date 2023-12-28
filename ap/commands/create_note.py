@@ -3,24 +3,29 @@ import json
 
 
 class CreateNoteCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.content = " ".join(args.content)
         self.public = args.public
         self.followers_only = args.followers_only
         self.private = args.private
         self.to = args.to
         self.cc = args.cc
+        self.in_reply_to = args.in_reply_to
 
     def run(self):
+        obj = {
+            "type": "Note",
+            "content": self.content,
+        }
+        if self.in_reply_to:
+            obj["inReplyTo"] = self.in_reply_to
+
         act = {
             "to": [],
             "cc": [],
             "type": "Create",
-            "object": {
-                "type": "Note",
-                "content": self.content,
-            },
+             "object": obj
         }
 
         if self.public:

@@ -2,8 +2,8 @@ from .command import Command
 
 
 class DeleteCommand(Command):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, args, env):
+        super().__init__(args, env)
         self.id = args.id
         self.force = args.force
 

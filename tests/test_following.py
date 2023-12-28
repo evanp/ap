@@ -101,7 +101,7 @@ class TestFollowingCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     def test_following(self, mock_requests_post, mock_requests_get, mock_file):
 
-        run_command(["following"], {})
+        run_command(["following"], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
