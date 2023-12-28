@@ -49,15 +49,8 @@ class LoginCommand(Command):
         return (verifier, challenge)
 
     def oauth_endpoints(self, json):
-        endpoints = json.get("endpoints", None)
-        if endpoints is None:
-            raise Exception("No endpoints found")
-        auth_endpoint = endpoints.get("oauthAuthorizationEndpoint", None)
-        if auth_endpoint is None:
-            raise Exception("No oauthAuthorizationEndpoint found")
-        token_endpoint = endpoints.get("oauthTokenEndpoint", None)
-        if token_endpoint is None:
-            raise Exception("No oauthTokenEndpoint found")
+        auth_endpoint = self.get_endpoint(json, "oauthAuthorizationEndpoint")
+        token_endpoint = self.get_endpoint(json, "oauthTokenEndpoint")
         return (auth_endpoint, token_endpoint)
 
     def save_token(self, token):
