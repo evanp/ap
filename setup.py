@@ -1,6 +1,11 @@
 from setuptools import setup, find_packages
 from ap.version import __version__
 
+# Function to read the contents of the requirements file
+def read_requirements():
+    with open('requirements.txt') as req:
+        return req.read().splitlines()
+
 setup(
     name='ap',
     version=__version__,
@@ -10,13 +15,7 @@ setup(
             'ap=ap.main:main',  # "ap" is the command, "ap.main:main" refers to the main function in your main.py
         ],
     },
-    install_requires=[
-        'requests',
-        'webfinger',
-        'oauthlib',
-        'requests_oauthlib',
-        'tabulate',
-    ],
+    install_requires=read_requirements(),
     author='Evan Prodromou',
     author_email='evan@prodromou.name',
     description='A simple command-line ActivityPub client',
