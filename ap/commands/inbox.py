@@ -1,7 +1,7 @@
 from .command import Command
 import itertools
 from tabulate import tabulate
-
+from requests.exceptions import HTTPError
 
 class InboxCommand(Command):
     def __init__(self, args, env):
@@ -22,10 +22,19 @@ class InboxCommand(Command):
         )
         rows = []
         for item in slice:
-            id = self.to_id(item)
-            actor = self.to_webfinger(item["actor"])
-            type = item.get("type", None)
-            summary = self.text_prop(item, "summary")
-            published = item.get("published")
+            # Use the object as provided as fallback
+            try:
+                object = self.to_object(item, ["actor", "type", "summary", "published"])
+            except HTTPError as e:
+                object = item
+            id = self.to_id(object)
+            type = object.get("type", None)
+            summary = self.text_prop(object, "summary")
+            published = object.get("published", None)
+            # Use the actor id as fallback
+            try:
+                actor = self.to_webfinger(object["actor"])
+            except HTTPError as e:
+                actor = self.to_id(object["actor"])
             rows.append([id, actor, type, summary, published])
         print(tabulate(rows, headers=["id", "actor", "type", "summary", "published"]))
