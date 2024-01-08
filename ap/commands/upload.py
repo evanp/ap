@@ -58,9 +58,13 @@ class UploadCommand(Command):
 
         if self.to:
             for to in self.to:
+                if "to" not in obj:
+                    obj["to"] = []
                 obj["to"].append(self.get_actor_id(to))
         if self.cc:
             for cc in self.cc:
+                if "cc" not in obj:
+                    obj["cc"] = []
                 obj["cc"].append(self.get_actor_id(cc))
 
         file_data = (path.name, path.open("rb"), type)
