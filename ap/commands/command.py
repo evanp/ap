@@ -5,7 +5,7 @@ import json
 from requests_oauthlib import OAuth2Session
 from urllib.parse import urlparse
 import itertools
-
+import re
 
 class Command:
     def __init__(self, args, env):
@@ -52,12 +52,15 @@ class Command:
         return self._session
 
     def to_id(self, prop):
-        if isinstance(prop, dict):
-            return prop["id"]
-        elif isinstance(prop, str):
+        if isinstance(prop, str):
             return prop
+        elif isinstance(prop, dict):
+            if "id" in prop:
+                return prop["id"]
+            else:
+                raise Exception("No id found")
         else:
-            raise Exception("Invalid property type")
+            raise Exception(f'Invalid property type for {prop}')
 
     def to_object(self, obj, required=[]):
         if isinstance(obj, dict):
@@ -80,24 +83,40 @@ class Command:
             raise Exception("Cannot format this as a webfinger")
         return obj["preferredUsername"] + "@" + urlparse(obj["id"]).netloc
 
-    def get_actor_id(self, id):
-        if not id.startswith("https://"):
-            if id.startswith("@"):
+    def is_webfinger_id(self, id):
+        return re.match(r"^(acct:)?@?[^@]+@[^@]+$", id) is not None
+
+    def is_activitypub_id(self, id):
+        return id.startswith("https://")
+
+    def to_webfinger_url(self, id):
+        if id.startswith("@"):
                 id = "acct:" + id[1:]
-            elif id.startswith("acct:"):
-                pass
-            else:
-                id = "acct:" + id
-            wf = webfinger.finger(id)
-            matches = [
-                l["href"]
-                for l in wf.links
-                if l["rel"] == "self" and l["type"] == "application/activity+json"
-            ]
-            if len(matches) == 0:
-                raise Exception("No ActivityPub account found")
-            id = matches[0]
+        elif id.startswith("acct:"):
+            pass
+        else:
+            id = "acct:" + id
         return id
+
+    def to_activitypub_id(self, id):
+        url = self.to_webfinger_url(id)
+        wf = webfinger.finger(url)
+        matches = [
+            l["href"]
+            for l in wf.links
+            if l["rel"] == "self" and l["type"] == "application/activity+json"
+        ]
+        if len(matches) == 0:
+            raise Exception("No ActivityPub account found")
+        return matches[0]
+
+    def get_actor_id(self, id):
+        if self.is_activitypub_id(id):
+            return id
+        elif self.is_webfinger_id(id):
+            return self.to_activitypub_id(id)
+        else:
+            raise Exception("Invalid id")
 
     def get_public(self, id):
         headers = {
