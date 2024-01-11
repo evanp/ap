@@ -23,18 +23,16 @@ class InboxCommand(Command):
         rows = []
         for item in slice:
             # Use the object as provided as fallback
-            try:
-                object = self.to_object(item, ["actor", "type", "summary", "published"])
-            except HTTPError as e:
-                object = item
-            id = self.to_id(object)
-            type = object.get("type", None)
-            summary = self.text_prop(object, "summary")
-            published = object.get("published", None)
+            activity = self.to_object(item, [["actor", "attributedTo"], "type", "summary", "published", "id"])
+            id = activity.get("id", None)
+            type = activity.get("type", None)
+            summary = self.text_prop(activity, "summary")
+            published = activity.get("published", None)
             # Use the actor id as fallback
-            try:
-                actor = self.to_webfinger(object["actor"])
-            except HTTPError as e:
-                actor = self.to_id(object["actor"])
+            actor_prop = activity.get("actor", activity.get("attributedTo", None))
+            if actor_prop is None:
+                actor = "<NONE>"
+            else:
+                actor = self.to_webfinger(actor_prop)
             rows.append([id, actor, type, summary, published])
         print(tabulate(rows, headers=["id", "actor", "type", "summary", "published"]))
