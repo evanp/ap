@@ -3,10 +3,29 @@
         "https://www.w3.org/ns/activitystreams",
         "https://purl.archive.org/socialweb/oauth"
     ],
+    "id": "https://evanp.github.io/ap/client.jsonld",
     "type": "Application",
     "name": "ap",
     "summaryMap": {
-        "en": "ap command-line ActivityPub client"
+        "en": "<b>ap</b> is a command-line client for the <a href=\"https://www.w3.org/TR/activitypub/\">ActivityPub</a> API. It can post and read notes, upload media, follow and unfollow users, and review the inbox and outbox, among other tasks."
     },
-    "redirectURI": "http://localhost:63546/callback"
+    "icon": {
+        "type": "Link",
+        "href": "https://evanp.github.io/ap/icon-256.png",
+        "mediaType": "image/png",
+        "width": 256,
+        "height": 256
+    },
+    "url": "https://github.com/evanp/ap/",
+    "attributedTo": {
+        "type": "Person",
+        "name": "Evan Prodromou",
+        "id": "https://cosocial.ca/users/evan",
+        "icon" : {
+            "mediaType" : "image/png",
+            "type" : "Image",
+            "url" : "https://media.cosocial.ca/accounts/avatars/109/493/705/899/503/027/original/b3edd95717f7b7b3.png"
+         }
+    },
+    "redirectURI": "https://localhost:63546/callback"
 }
