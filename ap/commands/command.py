@@ -7,6 +7,13 @@ from urllib.parse import urlparse
 import itertools
 import re
 from typing import Generator, Dict
+from ap.version import __version__
+
+USER_AGENT = f"ap/{__version__}"
+BASE_HEADERS = {
+    "Accept": "application/ld+json,application/activity+json,application/json",
+    "User-Agent": USER_AGENT
+}
 
 class Command:
     def __init__(self, args, env):
@@ -41,7 +48,7 @@ class Command:
         if self._logged_in_actor is None:
             id = self.logged_in_actor_id()
             oauth = self.session()
-            r = oauth.get(id)
+            r = oauth.get(id, headers=BASE_HEADERS)
             r.raise_for_status()
             self._logged_in_actor = r.json()
         return self._logged_in_actor
@@ -120,10 +127,7 @@ class Command:
             raise Exception("Invalid id")
 
     def get_public(self, id: str) -> dict:
-        headers = {
-            "Accept": "application/ld+json,application/activity+json,application/json"
-        }
-        r = requests.get(id, headers=headers)
+        r = requests.get(id, headers=BASE_HEADERS)
         r.raise_for_status()
         return r.json()
 
@@ -139,10 +143,7 @@ class Command:
 
     def get_local(self, id: str) -> dict:
         oauth = self.session()
-        headers = {
-            "Accept": "application/ld+json,application/activity+json,application/json"
-        }
-        r = oauth.get(id, headers=headers)
+        r = oauth.get(id, headers=BASE_HEADERS)
         r.raise_for_status()
         return r.json()
 
@@ -150,7 +151,7 @@ class Command:
         actor = self.logged_in_actor()
         proxyUrl = self.get_endpoint(actor, "proxyUrl")
         oauth = self.session()
-        r = oauth.post(proxyUrl, data={"id": id})
+        r = oauth.post(proxyUrl, headers=BASE_HEADERS, data={"id": id})
         r.raise_for_status()
         return r.json()
 
@@ -186,7 +187,7 @@ class Command:
             raise Exception("No outbox found")
         outbox_id = self.to_id(actor["outbox"])
         oauth = self.session()
-        headers = {
+        headers = {**BASE_HEADERS,
             "Content-Type": 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'
         }
         data = {"@context": "https://www.w3.org/ns/activitystreams", **act}

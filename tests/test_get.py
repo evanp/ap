@@ -7,7 +7,9 @@ import sys
 import requests
 from requests_oauthlib import OAuth2Session
 import json
+from ap.version import __version__
 
+USER_AGENT = f"ap/{__version__}"
 ACTOR_ID = "https://social.example/users/evanp"
 NOTE_ID = "https://social.example/users/evanp/note/1"
 ACTOR = {
@@ -18,8 +20,11 @@ ACTOR = {
 NOTE = {"type": "Note", "id": NOTE_ID, "content": "Hello World"}
 TOKEN_FILE_DATA = json.dumps({"actor_id": ACTOR_ID, "access_token": "12345678"})
 
+request_headers = []
 
 def mock_oauth_get(url, headers=None):
+    global request_headers
+    request_headers.append(headers)
     if url == ACTOR_ID:
         return MagicMock(status_code=200, json=lambda: ACTOR)
     elif url == NOTE_ID:
@@ -42,6 +47,9 @@ class TestGetCommand(unittest.TestCase):
 
         # Assertions
         mock_requests_get.assert_called_once()
+        for headers in request_headers:
+            self.assertIn("User-Agent", headers)
+            self.assertRegex(headers["User-Agent"], USER_AGENT)
         self.assertIn(NOTE["content"], sys.stdout.getvalue())
 
 
