@@ -92,10 +92,12 @@ class Command:
         return obj["preferredUsername"] + "@" + urlparse(obj["id"]).netloc
 
     def is_webfinger_id(self, id: str) -> bool:
+        if self.is_activitypub_id(id):
+            return False
         return re.match(r"^(acct:)?@?[^@]+@[^@]+$", id) is not None
 
     def is_activitypub_id(self, id: str) -> bool:
-        return id.startswith("https://")
+        return re.match(r"https:\/\/[\w.-]+(?:\.[\w.-]+)+[\w\-\._~:/?#[\]@!$&'()*+,;=]*", id) is not None
 
     def to_webfinger_url(self, id: str) -> str:
         if id.startswith("@"):

@@ -8,7 +8,10 @@ class GetCommand(Command):
         self.id = args.id
 
     def run(self):
-        if (self.is_webfinger_id(self.id)):
-            self.id = self.to_activitypub_id(self.id)
+        if (not self.is_activitypub_id(self.id)):
+            if (self.is_webfinger_id(self.id)):
+                self.id = self.to_activitypub_id(self.id)
+            else:
+                raise Exception(f"Invalid id: {self.id}")
         data = self.get_object(self.id)
         print(json.dumps(data, indent=4))
