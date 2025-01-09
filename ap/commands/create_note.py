@@ -1,11 +1,11 @@
 from .command import Command
 import json
-
+import html
 
 class CreateNoteCommand(Command):
     def __init__(self, args, env):
         super().__init__(args, env)
-        self.content = " ".join(args.content)
+        self.source = " ".join(args.source)
         self.public = args.public
         self.followers_only = args.followers_only
         self.private = args.private
@@ -16,7 +16,12 @@ class CreateNoteCommand(Command):
     def run(self):
         obj = {
             "type": "Note",
-            "content": self.content,
+            "source": {
+                "mediaType": "text/plain",
+                "content": self.source
+            },
+            "tags": self.getTags(self.source),
+            "content": self.sourceToHTML(self.source)
         }
         if self.in_reply_to:
             obj["inReplyTo"] = self.in_reply_to
@@ -52,3 +57,9 @@ class CreateNoteCommand(Command):
         result = self.do_activity(act)
 
         print(json.dumps(result, indent=4))
+
+    def getTags(self, source):
+        return None
+
+    def sourceToHTML(self, source):
+        return html.escape(source) 

@@ -90,7 +90,7 @@ def make_parser():
     subsubparsers = create_parser.add_subparsers(dest="subsubcommand")
 
     note_parser = subsubparsers.add_parser("note", help="Create a note")
-    note_parser.add_argument("content", nargs="+", help="Content of the note")
+    note_parser.add_argument("source", nargs="+", help="Source of the note")
     group = note_parser.add_mutually_exclusive_group()
     group.add_argument(
         "--private",
