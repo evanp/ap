@@ -1,10 +1,13 @@
 from setuptools import setup, find_packages
 from ap.version import __version__
 
-# Function to read the contents of the requirements file
+# Function to read dependencies from Pipfile
 def read_requirements():
-    with open('requirements.txt') as req:
-        return req.read().splitlines()
+    import toml  # Ensure you install this dependency with `pip install toml`
+
+    pipfile_data = toml.load('Pipfile')
+    packages = pipfile_data.get('packages', {})
+    return [f"{pkg}{ver if ver != '*' else ''}" for pkg, ver in packages.items()]
 
 setup(
     name='ap',
