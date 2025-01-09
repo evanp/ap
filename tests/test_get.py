@@ -19,6 +19,14 @@ ACTOR = {
 }
 NOTE = {"type": "Note", "id": NOTE_ID, "content": "Hello World"}
 TOKEN_FILE_DATA = json.dumps({"actor_id": ACTOR_ID, "access_token": "12345678"})
+ACTOR_WEBFINGER_ID = "evanp@social.example"
+ACTOR_WEBFINGER_JSON = {
+    "subject": "acct:evanp@social.example",
+    "links": [{"rel": "self",
+               "type": "application/activity+json",
+               "href": ACTOR_ID}]
+}
+ACTOR_WEBFINGER_URL = "https://social.example/.well-known/webfinger?resource=acct%3Aevanp%40social.example"
 
 ACTOR2_ID = "https://social.example/@other"
 NOTE2_ID = "https://social.example/@other/123456789012345678"
@@ -48,6 +56,17 @@ def mock_oauth_get(url, headers=None):
     else:
         return MagicMock(status_code=404)
 
+def mock_requests_get(url, **kwargs):
+    print(f"mock_requests_get({url})")
+    if url == ACTOR_WEBFINGER_URL:
+        print("Got ACTOR_WEBFINGER_URL; returning ACTOR_WEBFINGER_JSON")
+        return MagicMock(
+            status_code=200,
+            headers={"Content-Type": "application/xrd+json"},
+            json=lambda: ACTOR_WEBFINGER_JSON
+        )
+    else:
+        return MagicMock(status_code=404)
 
 class TestGetCommand(unittest.TestCase):
     def setUp(self):
@@ -77,6 +96,32 @@ class TestGetCommand(unittest.TestCase):
         # Assertions
         mock_requests_get.assert_called_once()
         self.assertIn(NOTE2["content"], sys.stdout.getvalue())
+
+    @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
+    @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
+    def test_get_actor(self, mock_requests_get, mock_file):
+        run_command(["get", ACTOR_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+
+        # Assertions
+        mock_requests_get.assert_called_once()
+        for headers in request_headers:
+            self.assertIn("User-Agent", headers)
+            self.assertRegex(headers["User-Agent"], USER_AGENT)
+        self.assertIn(ACTOR['type'], sys.stdout.getvalue())
+
+    @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
+    @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
+    @patch('requests.get', side_effect=mock_requests_get)
+    def test_get_webfinger(self, mock_requests_get, mock_oauth_get, mock_file):
+        run_command(["get", ACTOR_WEBFINGER_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+
+        # Assertions
+        mock_oauth_get.assert_called_once()
+        mock_requests_get.assert_called_once()
+        for headers in request_headers:
+            self.assertIn("User-Agent", headers)
+            self.assertRegex(headers["User-Agent"], USER_AGENT)
+        self.assertIn(ACTOR_ID, sys.stdout.getvalue())
 
 if __name__ == "__main__":
     unittest.main()
