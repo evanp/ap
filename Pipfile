@@ -8,8 +8,8 @@ requests = "*"
 requests-oauthlib = "*"
 tabulate = "*"
 webfinger = "*"
-setuptools = "*"
 toml = "*"
+setuptools = "*"
 
 [dev-packages]
 requests = "==2.31.0"
