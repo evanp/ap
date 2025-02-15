@@ -8,6 +8,7 @@ import requests
 from requests_oauthlib import OAuth2Session
 import json
 from ap.version import __version__
+import logging
 
 USER_AGENT = f"ap/{__version__}"
 ACTOR_ID = "https://social.example/users/evanp"
@@ -26,7 +27,9 @@ ACTOR_WEBFINGER_JSON = {
                "type": "application/activity+json",
                "href": ACTOR_ID}]
 }
-ACTOR_WEBFINGER_URL = "https://social.example/.well-known/webfinger?resource=acct%3Aevanp%40social.example"
+
+WEBFINGER_URL_BASE = "https://social.example/.well-known/webfinger"
+ACTOR_WEBFINGER_URL = WEBFINGER_URL_BASE + "?resource=acct%3Aevanp%40social.example"
 
 ACTOR2_ID = "https://social.example/@other"
 NOTE2_ID = "https://social.example/@other/123456789012345678"
@@ -57,13 +60,13 @@ def mock_oauth_get(url, headers=None):
         return MagicMock(status_code=404)
 
 def mock_requests_get(url, **kwargs):
-    print(f"mock_requests_get({url})")
-    if url == ACTOR_WEBFINGER_URL:
-        print("Got ACTOR_WEBFINGER_URL; returning ACTOR_WEBFINGER_JSON")
+    logging.debug(f"mock_requests_get({url})")
+    if url == WEBFINGER_URL_BASE:
+        logging.debug("Got WEBFINGER_URL_BASE; returning ACTOR_WEBFINGER_JSON")
         return MagicMock(
             status_code=200,
-            headers={"Content-Type": "application/xrd+json"},
-            json=lambda: ACTOR_WEBFINGER_JSON
+            headers={"Content-Type": "application/jrd+json"},
+            json=lambda: ACTOR_WEBFINGER_JSON,
         )
     else:
         return MagicMock(status_code=404)
@@ -71,9 +74,12 @@ def mock_requests_get(url, **kwargs):
 class TestGetCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
+        self.log_stream = io.StringIO()
+        logging.basicConfig(level=logging.DEBUG, stream=self.log_stream)
 
     def tearDown(self):
         sys.stdout = self.held
+        # print(self.log_stream.getvalue())
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
@@ -86,7 +92,6 @@ class TestGetCommand(unittest.TestCase):
             self.assertIn("User-Agent", headers)
             self.assertRegex(headers["User-Agent"], USER_AGENT)
         self.assertIn(NOTE["content"], sys.stdout.getvalue())
-
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
@@ -113,6 +118,7 @@ class TestGetCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     @patch('requests.get', side_effect=mock_requests_get)
     def test_get_webfinger(self, mock_requests_get, mock_oauth_get, mock_file):
+        logging.getLogger("webfinger").setLevel(logging.DEBUG)
         run_command(["get", ACTOR_WEBFINGER_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
