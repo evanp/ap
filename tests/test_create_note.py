@@ -73,8 +73,8 @@ def mock_oauth_get(url, headers=None):
     elif url == OTHER_WEBFINGER_URL:
         return MagicMock(
             status_code=200,
-            headers={"Content-Type": "application/xrd+json"},
-            json=lambda: OTHER_WEBFINGER_JSON
+            headers={"Content-Type": "application/jrd+json"},
+            json=lambda: OTHER_WEBFINGER_JSON,
         )
     else:
         return MagicMock(status_code=404)
@@ -172,7 +172,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         activity = json.loads(sys.stdout.getvalue())
         self.assertIsNotNone(activity["object"])
         object = activity["object"]
-        self.assertIn(AT_MENTION_CONTENT, object["source"])
+        self.assertIn(AT_MENTION_CONTENT, object["source"]["content"])
         self.assertIn(AT_MENTION_LINK, object["content"])
         self.assertEqual(object['tag'].length, 1)
         self.assertEqual(object['tag'][0]['type'], 'Mention')
@@ -194,7 +194,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         activity = json.loads(sys.stdout.getvalue())
         self.assertIsNotNone(activity["object"])
         object = activity["object"]
-        self.assertIn(AT_MENTION_LOCAL_CONTENT, object["source"])
+        self.assertIn(AT_MENTION_LOCAL_CONTENT, object["source"]["content"])
         self.assertIn(AT_MENTION_LOCAL_LINK, object["content"])
         self.assertEqual(object['tag'].length, 1)
         self.assertEqual(object['tag'][0]['type'], 'Mention')
@@ -216,7 +216,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         activity = json.loads(sys.stdout.getvalue())
         self.assertIsNotNone(activity["object"])
         object = activity["object"]
-        self.assertIn(HASHTAG_CONTENT, object["source"])
+        self.assertIn(HASHTAG_CONTENT, object["source"]["content"])
         self.assertIn(HASHTAG_LINK, object["content"])
         self.assertEqual(object['tag'].length, 1)
         self.assertEqual(object['tag'][0]['type'], 'Hashtag')
@@ -238,7 +238,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         activity = json.loads(sys.stdout.getvalue())
         self.assertIsNotNone(activity["object"])
         object = activity["object"]
-        self.assertIn(LINK_CONTENT, object["source"])
+        self.assertIn(LINK_CONTENT, object["source"]["content"])
         self.assertIn(LINK_LINK, object["content"])
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
@@ -256,7 +256,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         activity = json.loads(sys.stdout.getvalue())
         self.assertIsNotNone(activity["object"])
         object = activity["object"]
-        self.assertIn(MARKUP_CONTENT, object["source"])
+        self.assertIn(MARKUP_CONTENT, object["source"]["content"])
         self.assertIn(MARKUP_HTML, object["content"])
 
 if __name__ == "__main__":
