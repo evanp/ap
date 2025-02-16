@@ -59,10 +59,9 @@ def mock_oauth_get(url, headers=None):
     else:
         return MagicMock(status_code=404)
 
+
 def mock_requests_get(url, **kwargs):
-    logging.debug(f"mock_requests_get({url})")
     if url == WEBFINGER_URL_BASE:
-        logging.debug("Got WEBFINGER_URL_BASE; returning ACTOR_WEBFINGER_JSON")
         return MagicMock(
             status_code=200,
             headers={"Content-Type": "application/jrd+json"},
@@ -70,6 +69,7 @@ def mock_requests_get(url, **kwargs):
         )
     else:
         return MagicMock(status_code=404)
+
 
 class TestGetCommand(unittest.TestCase):
     def setUp(self):
@@ -118,7 +118,6 @@ class TestGetCommand(unittest.TestCase):
     @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get)
     @patch('requests.get', side_effect=mock_requests_get)
     def test_get_webfinger(self, mock_requests_get, mock_oauth_get, mock_file):
-        logging.getLogger("webfinger").setLevel(logging.DEBUG)
         run_command(["get", ACTOR_WEBFINGER_ID], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
 
         # Assertions
@@ -128,6 +127,7 @@ class TestGetCommand(unittest.TestCase):
             self.assertIn("User-Agent", headers)
             self.assertRegex(headers["User-Agent"], USER_AGENT)
         self.assertIn(ACTOR_ID, sys.stdout.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

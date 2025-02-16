@@ -91,9 +91,7 @@ def mock_oauth_post(url, headers=None, data=None):
 
 
 def mock_requests_get(url, **kwargs):
-    logging.debug(f"mock_requests_get({url})")
     if url == WEBFINGER_URL_BASE:
-        logging.debug("Got WEBFINGER_URL_BASE; returning OTHER_WEBFINGER_JSON")
         return MagicMock(
             status_code=200,
             headers={"Content-Type": "application/jrd+json"},
@@ -106,12 +104,9 @@ def mock_requests_get(url, **kwargs):
 class TestCreateNoteCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
-        self.log_stream = io.StringIO()
-        logging.basicConfig(level=logging.DEBUG, stream=self.log_stream)
 
     def tearDown(self):
         sys.stdout = self.held
-        print(self.log_stream.getvalue())
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)

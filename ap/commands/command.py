@@ -288,7 +288,6 @@ class Command:
         segments = self._segment(html)
 
         def repl(m):
-            logging.debug(m)
             name = m.group(1)
             href = self._tag_namespace + name
             tag.append({"type": "Hashtag", "name": m.group(0), "href": href})
