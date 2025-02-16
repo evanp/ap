@@ -313,7 +313,8 @@ class Command:
             webfinger = match[1:]
             try:
                 href = self._home_page(webfinger)
-            except:
+            except Exception as e:
+                logging.error(e)
                 return match
             if not href:
                 return match
@@ -337,7 +338,7 @@ class Command:
         pattern = r"(<[^>]+>[^<]+<\/[^>]+>)"
         return re.split(pattern, html)
 
-    def _home_page(self, webfinger: str) -> str:
+    def _home_page(self, id: str) -> str:
         url = self.to_webfinger_url(id)
         wf = webfinger.finger(url)
         profiles = [
