@@ -14,7 +14,6 @@ CLIENT_ID = "https://evanp.github.io/ap/client.jsonld"
 REDIRECT_URI = "http://localhost:63546/callback"
 SCOPE = "read write"
 
-
 class LoginRedirectHandler(BaseHTTPRequestHandler):
     command = None
 
@@ -30,6 +29,9 @@ class LoginRedirectHandler(BaseHTTPRequestHandler):
             LoginRedirectHandler.command.on_callback(
                 urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             )
+
+    def log_request(self, code="-", size="-"):
+        pass
 
 
 class LoginCommand(Command):
@@ -54,7 +56,7 @@ class LoginCommand(Command):
         return (auth_endpoint, token_endpoint)
 
     def save_token(self, token):
-        apdir = Path.home() / ".ap"
+        apdir = Path(self.env.get("HOME")) / ".ap"
         if not apdir.exists():
             apdir.mkdir(700)
         data = {"actor_id": self.actor_id, **token}
