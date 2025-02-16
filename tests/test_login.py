@@ -89,7 +89,7 @@ def mock_webbrowser_open(url):
         authorization_params = parse_qs(parsed.query)
         redirect_uri = authorization_params["redirect_uri"][0]
         def delayed_callback():
-            time.sleep(1)
+            time.sleep(0.1)
             params = {
                 "code": AUTHORIZATION_CODE,
                 "state": authorization_params['state'][0]
@@ -124,4 +124,3 @@ class TestLoginCommand(unittest.TestCase):
         assert "client_id" in authorization_params
 
         mock_file.assert_called_once_with(Path('/home/notauser/.ap/token.json'), 'w')
-
