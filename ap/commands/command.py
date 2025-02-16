@@ -8,12 +8,17 @@ import itertools
 import re
 from typing import Generator, Dict
 from ap.version import __version__
+from html import escape
+import logging
+
+AS2 = "https://www.w3.org/ns/activitystreams#"
 
 USER_AGENT = f"ap/{__version__}"
 BASE_HEADERS = {
     "Accept": "application/ld+json,application/activity+json,application/json",
     "User-Agent": USER_AGENT
 }
+TAG_NAMESPACE = "https://tags.pub/"
 
 class Command:
     def __init__(self, args, env):
@@ -24,6 +29,7 @@ class Command:
         self._token_file_data = None
         self._session = None
         self._language_code = None
+        self._tag_namespace = TAG_NAMESPACE
 
     def logged_in_actor_id(self) -> str:
         if self._logged_in_actor_id is None:
@@ -101,7 +107,7 @@ class Command:
 
     def to_webfinger_url(self, id: str) -> str:
         if id.startswith("@"):
-                id = "acct:" + id[1:]
+            id = "acct:" + id[1:]
         elif id.startswith("acct:"):
             pass
         else:
@@ -252,3 +258,118 @@ class Command:
 
     def collection_slice(self, coll: dict, offset: int, limit: int):
         return itertools.islice(self.items(coll), offset, offset + limit)
+
+    def transform_microsyntax(self, source: str) -> tuple[str, list[dict[str, str]]]:
+        html = escape(source)
+        tag = []
+        html, tag = self._replace_urls(html, tag)
+        html, tag = self._replace_hashtags(html, tag)
+        html, tag = self._replace_mentions(html, tag)
+        html = f"<p>{html}</p>"
+        return html, tag
+
+    def _replace_urls(
+        self, html: str, tag: list[dict[str, str]]
+    ) -> tuple[str, list[dict[str, str]]]:
+        pattern = r"https?://\S+"
+        segments = self._segment(html)
+        for i, segment in enumerate(segments):
+            if self._is_link(segment):
+                continue
+            segments[i] = re.sub(
+                pattern, lambda m: f'<a href="{m.group(0)}">{m.group(0)}</a>', segment
+            )
+        return "".join(segments), tag
+
+    def _replace_hashtags(
+        self, html: str, tag: list[dict[str, str]]
+    ) -> tuple[str, list[dict[str, str]]]:
+        pattern = r"#(\w+)"
+        segments = self._segment(html)
+
+        def repl(m):
+            logging.debug(m)
+            name = m.group(1)
+            href = self._tag_namespace + name
+            tag.append({"type": "Hashtag", "name": m.group(0), "href": href})
+            return f'<a href="{href}">{m.group(0)}</a>'
+
+        for i, segment in enumerate(segments):
+            if self._is_link(segment):
+                continue
+            segments[i] = re.sub(pattern, repl, segment)
+
+        return "".join(segments), tag
+
+    def _replace_mentions(
+        self, html: str, tag: list[dict[str, str]]
+    ) -> tuple[str, list[dict[str, str]]]:
+
+        pattern = r"@[a-zA-Z0-9_]+(?:[a-zA-Z0-9_.-]*[a-zA-Z0-9_]+)?@[a-zA-Z0-9_.-]+"
+
+        def repl(m):
+            match = m.group(0)
+            # Remove the leading "@" for lookup.
+            webfinger = match[1:]
+            try:
+                href = self._home_page(webfinger)
+            except:
+                return match
+            if not href:
+                return match
+            tag.append({"type": "Mention", "name": match, "href": href})
+            return f'<a href="{href}">{match}</a>'
+
+        segments = self._segment(html)
+        for i, segment in enumerate(segments):
+            if self._is_link(segment):
+                continue
+            segments[i] = re.sub(pattern, repl, segment)
+        return "".join(segments), tag
+
+    def _is_link(self, segment: str):
+        return (
+            segment.startswith("<a>") or segment.startswith("<a ")
+        ) and segment.endswith("</a>")
+
+    def _segment(self, html: str):
+        # Split the HTML while keeping HTML tag segments intact.
+        pattern = r"(<[^>]+>[^<]+<\/[^>]+>)"
+        return re.split(pattern, html)
+
+    def _home_page(self, webfinger: str) -> str:
+        url = self.to_webfinger_url(id)
+        wf = webfinger.finger(url)
+        profiles = [
+            l["href"]
+            for l in wf.links
+            if l["rel"] == "http://webfinger.net/rel/profile-page"
+        ]
+        matches = [
+            l["href"]
+            for l in wf.links
+            if l["rel"] == "self" and l["type"] == "application/activity+json"
+        ]
+        if len(matches) > 0:
+            actor = self.get_object(matches[0])
+            if actor is not None and actor["url"] is not None:
+                return self._get_href(actor["url"])
+
+        if len(profiles):
+            return profiles[0]
+
+        return None
+
+    def _get_href(self, prop) -> str:
+        if type(prop) == str:
+            return prop
+        elif type(prop) == dict:
+            if "href" in prop:
+                return prop["href"]
+            else:
+                return None
+        elif type(prop) == list:
+            if len(prop) > 0:
+                return self._get_href(prop[0])
+            else:
+                return None

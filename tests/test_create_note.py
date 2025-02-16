@@ -6,6 +6,7 @@ import sys
 import requests
 from requests_oauthlib import OAuth2Session
 import json
+import logging
 
 ACTOR_ID = "https://social.example/users/evanp"
 OTHER_ID = "https://social.example/users/other"
@@ -55,7 +56,7 @@ AT_MENTION_LINK = f" <a href=\"{OTHER['url']}\">@other@social.example</a>"
 AT_MENTION_LOCAL_CONTENT = f"Hello, @other"
 AT_MENTION_LOCAL_LINK = f" <a href=\"{OTHER['url']}\">@other</a>"
 HASHTAG_CONTENT = f"Hello, World! #greeting"
-HASHTAG_LINK = f"<a href=\"https://social.example/tags/greeting\">#greeting</a>"
+HASHTAG_LINK = f'<a href="https://tags.pub/greeting">#greeting</a>'
 LINK_CONTENT = f"Hello, https://example.com"
 LINK_LINK = f"<a href=\"https://example.com\">https://example.com</a>"
 MARKUP_CONTENT = f"This > that & that < this"
@@ -98,9 +99,12 @@ def mock_oauth_post(url, headers=None, data=None):
 class TestCreateNoteCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
+        self.log_stream = io.StringIO()
+        logging.basicConfig(level=logging.DEBUG, stream=self.log_stream)
 
     def tearDown(self):
         sys.stdout = self.held
+        print(self.log_stream.getvalue())
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)
@@ -174,7 +178,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         object = activity["object"]
         self.assertIn(AT_MENTION_CONTENT, object["source"]["content"])
         self.assertIn(AT_MENTION_LINK, object["content"])
-        self.assertEqual(object['tag'].length, 1)
+        self.assertEqual(len(object["tag"]), 1)
         self.assertEqual(object['tag'][0]['type'], 'Mention')
         self.assertEqual(object['tag'][0]['href'], OTHER['url'])
         self.assertEqual(object['tag'][0]['name'], '@other@social.example')
@@ -196,7 +200,7 @@ class TestCreateNoteCommand(unittest.TestCase):
         object = activity["object"]
         self.assertIn(AT_MENTION_LOCAL_CONTENT, object["source"]["content"])
         self.assertIn(AT_MENTION_LOCAL_LINK, object["content"])
-        self.assertEqual(object['tag'].length, 1)
+        self.assertEqual(len(object["tag"]), 1)
         self.assertEqual(object['tag'][0]['type'], 'Mention')
         self.assertEqual(object['tag'][0]['href'], OTHER['url'])
         self.assertEqual(object['tag'][0]['name'], '@other')
@@ -218,10 +222,10 @@ class TestCreateNoteCommand(unittest.TestCase):
         object = activity["object"]
         self.assertIn(HASHTAG_CONTENT, object["source"]["content"])
         self.assertIn(HASHTAG_LINK, object["content"])
-        self.assertEqual(object['tag'].length, 1)
+        self.assertEqual(len(object["tag"]), 1)
         self.assertEqual(object['tag'][0]['type'], 'Hashtag')
-        self.assertEqual(object['tag'][0]['href'], 'https://social.example/tags/greeting')
-        self.assertEqual(activity['tag'][0]['name'], '#greeting')
+        self.assertEqual(object["tag"][0]["href"], "https://tags.pub/greeting")
+        self.assertEqual(object["tag"][0]["name"], "#greeting")
 
     @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
     @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post)

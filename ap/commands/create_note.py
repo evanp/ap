@@ -1,6 +1,7 @@
 from .command import Command
 import json
 import html
+import logging
 
 class CreateNoteCommand(Command):
     def __init__(self, args, env):
@@ -14,14 +15,12 @@ class CreateNoteCommand(Command):
         self.in_reply_to = args.in_reply_to
 
     def run(self):
+        html, tags = self.transform_microsyntax(self.source)
         obj = {
             "type": "Note",
-            "source": {
-                "mediaType": "text/plain",
-                "content": self.source
-            },
-            "tags": self.getTags(self.source),
-            "content": self.sourceToHTML(self.source)
+            "source": {"mediaType": "text/plain", "content": self.source},
+            "tag": tags,
+            "content": html,
         }
         if self.in_reply_to:
             obj["inReplyTo"] = self.in_reply_to
@@ -57,9 +56,3 @@ class CreateNoteCommand(Command):
         result = self.do_activity(act)
 
         print(json.dumps(result, indent=4))
-
-    def getTags(self, source):
-        return None
-
-    def sourceToHTML(self, source):
-        return html.escape(source) 
