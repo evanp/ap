@@ -23,3 +23,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 ap = "ap.main:main"
+
+[tool.poetry.group.dev.dependencies]
+nox = "^2025.5.1"
+
