@@ -58,7 +58,7 @@ class LoginCommand(Command):
     def save_token(self, token):
         apdir = Path(self.env.get("HOME")) / ".ap"
         if not apdir.exists():
-            apdir.mkdir(700)
+            apdir.mkdir(0o700)
         data = {"actor_id": self.actor_id, **token}
         with open(apdir / "token.json", "w") as f:
             f.write(json.dumps(data))
