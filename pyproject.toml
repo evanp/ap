@@ -24,7 +24,7 @@ keywords = ["activitypub", "social", "client"]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.2.0,<9.0.0",
+    "pytest>=8.2.0,<10.0.0",
 ]
 
 [project.scripts]
