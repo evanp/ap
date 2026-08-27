@@ -22,6 +22,11 @@ license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 keywords = ["activitypub", "social", "client"]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.2.0,<9.0.0",
+]
+
 [project.scripts]
 ap = "ap.main:main"
 

@@ -11,9 +11,11 @@ import json
 ACTOR_ID = "https://social.example/users/evanp"
 OTHER_1_ID = "https://different.example/users/other1"
 OTHER_2_ID = "https://social.example/users/other2"
+UNREACHABLE_ID = "https://unreachable.example/users/down"
 FOLLOWING_ID = f"{ACTOR_ID}/followers"
 PAGE_2_ID = f"{FOLLOWING_ID}/page/2"
 PAGE_1_ID = f"{FOLLOWING_ID}/page/1"
+UNREACHABLE_PAGE_ID = f"{FOLLOWING_ID}/page/unreachable"
 
 ACTOR = {
     "type": "Person",
@@ -61,6 +63,20 @@ PAGE_1 = {
     ],
 }
 
+UNREACHABLE_PAGE = {
+    "id": UNREACHABLE_PAGE_ID,
+    "partOf": FOLLOWING_ID,
+    "next": PAGE_1_ID,
+    "orderedItems": [
+        {
+            "id": UNREACHABLE_ID,
+            "type": "Person",
+            "preferredUsername": "down",
+        },
+        {"id": OTHER_1_ID, "type": "Person", "preferredUsername": "other1"},
+    ],
+}
+
 TOKEN_FILE_DATA = json.dumps({"actor_id": ACTOR_ID, "access_token": "12345678"})
 
 
@@ -89,6 +105,38 @@ def mock_oauth_post(url, headers=None, data=None):
         return MagicMock(status_code=404)
 
 
+def mock_oauth_get_unreachable(url, headers=None):
+    if url == ACTOR_ID:
+        return MagicMock(status_code=200, json=lambda: {
+            **ACTOR,
+            "following": {
+                "id": FOLLOWING_ID,
+                "attributedTo": ACTOR_ID,
+                "first": UNREACHABLE_PAGE_ID,
+            },
+        })
+    elif url == UNREACHABLE_PAGE_ID:
+        return MagicMock(status_code=200, json=lambda: UNREACHABLE_PAGE)
+    elif url == PAGE_1_ID:
+        return MagicMock(status_code=200, json=lambda: PAGE_1)
+    elif url == OTHER_2_ID:
+        return MagicMock(status_code=200, json=lambda: OTHER_2)
+    else:
+        return MagicMock(status_code=404)
+
+
+def mock_oauth_post_unreachable(url, headers=None, data=None):
+    if url == ACTOR["endpoints"]["proxyUrl"]:
+        if data["id"] == UNREACHABLE_ID:
+            raise requests.exceptions.ConnectionError()
+        elif data["id"] == OTHER_1_ID:
+            return MagicMock(status_code=200, json=lambda: OTHER_1)
+        else:
+            return MagicMock(status_code=404)
+    else:
+        return MagicMock(status_code=404)
+
+
 class TestFollowingCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
@@ -106,6 +154,21 @@ class TestFollowingCommand(unittest.TestCase):
         # Assertions
         self.assertGreaterEqual(mock_requests_get.call_count, 1)
         self.assertGreaterEqual(mock_requests_post.call_count, 1)
+        self.assertIn("other2@social.example", sys.stdout.getvalue())
+        self.assertIn("other1@different.example", sys.stdout.getvalue())
+
+    @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
+    @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post_unreachable)
+    @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get_unreachable)
+    def test_following_unreachable_remote_object(
+        self, mock_requests_post, mock_requests_get, mock_file
+    ):
+        run_command(["following"], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+
+        self.assertGreaterEqual(mock_requests_get.call_count, 1)
+        self.assertGreaterEqual(mock_requests_post.call_count, 1)
+        self.assertIn("<unavailable>", sys.stdout.getvalue())
+        self.assertIn(UNREACHABLE_ID, sys.stdout.getvalue())
         self.assertIn("other2@social.example", sys.stdout.getvalue())
         self.assertIn("other1@different.example", sys.stdout.getvalue())
 
