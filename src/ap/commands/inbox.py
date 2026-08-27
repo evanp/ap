@@ -1,7 +1,7 @@
 from .command import Command
 import itertools
 from tabulate import tabulate
-from requests.exceptions import HTTPError
+from requests.exceptions import RequestException
 
 class InboxCommand(Command):
     def __init__(self, args, env):
@@ -22,17 +22,20 @@ class InboxCommand(Command):
         )
         rows = []
         for item in slice:
-            # Use the object as provided as fallback
-            activity = self.to_object(item, [["actor", "attributedTo"], "type", "summary", "published", "id"])
-            id = activity.get("id", None)
-            type = activity.get("type", None)
-            summary = self.text_prop(activity, "summary")
-            published = activity.get("published", None)
-            # Use the actor id as fallback
-            actor_prop = activity.get("actor", activity.get("attributedTo", None))
-            if actor_prop is None:
-                actor = "<NONE>"
-            else:
-                actor = self.to_webfinger(actor_prop)
-            rows.append([id, actor, type, summary, published])
+            try:
+                # Use the object as provided as fallback
+                activity = self.to_object(item, [["actor", "attributedTo"], "type", "summary", "published", "id"])
+                id = activity.get("id", None)
+                type = activity.get("type", None)
+                summary = self.text_prop(activity, "summary")
+                published = activity.get("published", None)
+                # Use the actor id as fallback
+                actor_prop = activity.get("actor", activity.get("attributedTo", None))
+                if actor_prop is None:
+                    actor = "<NONE>"
+                else:
+                    actor = self.to_webfinger(actor_prop)
+                rows.append([id, actor, type, summary, published])
+            except RequestException as e:
+                rows.append([self.to_id(item), '<unavailable>', '<unavailable>', '<unavailable>', '<unavailable>'])
         print(tabulate(rows, headers=["id", "actor", "type", "summary", "published"]))

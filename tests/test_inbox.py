@@ -16,7 +16,9 @@ PAGE_2_ID = f"{INBOX_ID}/page/2"
 PAGE_1_ID = f"{INBOX_ID}/page/1"
 OTHER_ACTIVITY_ID = f"{OTHER_ID}/activity/11"
 ACTIVITY_ID = f"{ACTOR_ID}/activity/10"
+UNREACHABLE_ACTIVITY_ID = "https://unreachable.example/activity/12"
 INBOX = {"id": INBOX_ID, "attributedTo": ACTOR_ID, "first": PAGE_2_ID}
+UNREACHABLE_PAGE_ID = f"{INBOX_ID}/page/unreachable"
 
 ACTOR = {
     "type": "Person",
@@ -58,6 +60,24 @@ PAGE_1 = {
             "id": ACTIVITY_ID,
             "summary": "Page 1 Activity 10",
         }
+    ],
+}
+
+UNREACHABLE_PAGE = {
+    "id": UNREACHABLE_PAGE_ID,
+    "partOf": INBOX_ID,
+    "next": PAGE_1_ID,
+    "orderedItems": [
+        {
+            "type": "Activity",
+            "id": UNREACHABLE_ACTIVITY_ID,
+            "summary": "Unreachable Activity 12",
+        },
+        {
+            "type": "Activity",
+            "id": OTHER_ACTIVITY_ID,
+            "summary": "Page 2 Activity 11",
+        },
     ],
 }
 
@@ -124,6 +144,39 @@ def mock_oauth_post(url, headers=None, data=None):
         return mock_404(url)
 
 
+def mock_oauth_get_unreachable(url, headers=None):
+    if url == ACTOR_ID:
+        return mock_response(ACTOR_ID, ACTOR)
+    elif url == INBOX_ID:
+        return mock_response(INBOX_ID, {
+            "id": INBOX_ID,
+            "attributedTo": ACTOR_ID,
+            "first": UNREACHABLE_PAGE_ID,
+        })
+    elif url == UNREACHABLE_PAGE_ID:
+        return mock_response(UNREACHABLE_PAGE_ID, UNREACHABLE_PAGE)
+    elif url == PAGE_1_ID:
+        return mock_response(PAGE_1_ID, PAGE_1)
+    elif url == ACTIVITY_ID:
+        return mock_response(ACTIVITY_ID, ACTIVITY)
+    else:
+        return mock_404(url)
+
+
+def mock_oauth_post_unreachable(url, headers=None, data=None):
+    if url == ACTOR["endpoints"]["proxyUrl"]:
+        if data["id"] == UNREACHABLE_ACTIVITY_ID:
+            raise requests.exceptions.ConnectionError()
+        elif data["id"] == OTHER_ID:
+            return mock_response(OTHER_ID, OTHER)
+        elif data["id"] == OTHER_ACTIVITY_ID:
+            return mock_response(OTHER_ACTIVITY_ID, OTHER_ACTIVITY)
+        else:
+            return mock_404(data["id"])
+    else:
+        return mock_404(url)
+
+
 class TestInboxCommand(unittest.TestCase):
     def setUp(self):
         self.held, sys.stdout = sys.stdout, io.StringIO()  # Redirect stdout
@@ -142,6 +195,21 @@ class TestInboxCommand(unittest.TestCase):
         self.assertGreaterEqual(mock_requests_post.call_count, 1)
         self.assertIn("Page 1 Activity 10", sys.stdout.getvalue())
         self.assertIn("evanp@social.example", sys.stdout.getvalue())
+        self.assertIn("other@different.example", sys.stdout.getvalue())
+
+    @patch("builtins.open", new_callable=mock_open, read_data=TOKEN_FILE_DATA)
+    @patch("requests_oauthlib.OAuth2Session.post", side_effect=mock_oauth_post_unreachable)
+    @patch("requests_oauthlib.OAuth2Session.get", side_effect=mock_oauth_get_unreachable)
+    def test_inbox_unreachable_remote_object(
+        self, mock_requests_post, mock_requests_get, mock_file
+    ):
+        run_command(["inbox"], {'LANG': 'en_CA.UTF-8', 'HOME': '/home/notauser'})
+
+        self.assertGreaterEqual(mock_requests_get.call_count, 1)
+        self.assertGreaterEqual(mock_requests_post.call_count, 1)
+        self.assertIn(UNREACHABLE_ACTIVITY_ID, sys.stdout.getvalue())
+        self.assertIn("<unavailable>", sys.stdout.getvalue())
+        self.assertIn("Page 1 Activity 10", sys.stdout.getvalue())
         self.assertIn("other@different.example", sys.stdout.getvalue())
 
 
