@@ -1,7 +1,6 @@
 from .command import Command
-import itertools
 from tabulate import tabulate
-
+from requests.exceptions import RequestException
 
 class FollowersCommand(Command):
     def __init__(self, args, env):
@@ -14,15 +13,19 @@ class FollowersCommand(Command):
         slice = self.collection_slice(coll, self.offset, self.limit)
         rows = []
         for item in slice:
-            follower = self.to_object(
-                item,
-                [
-                    "id",
-                    "preferredUsername",
-                    ["name", "nameMap", "summary", "summaryMap"],
-                ],
-            )
-            id = self.to_webfinger(follower)
-            name = self.to_text(follower)
-            rows.append([id, name])
+            try:
+                follower = self.to_object(
+                    item,
+                    [
+                        "id",
+                        "preferredUsername",
+                        ["name", "nameMap", "summary", "summaryMap"],
+                    ],
+                )
+                id = self.to_webfinger(follower)
+                name = self.to_text(follower)
+                rows.append([id, name])
+            except RequestException as e:
+                rows.append(['<unavailable>', self.to_id(item)])
+
         print(tabulate(rows, headers=["id", "name"]))
