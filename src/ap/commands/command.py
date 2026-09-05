@@ -3,6 +3,7 @@ import webfinger
 from pathlib import Path
 import json
 from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import TokenExpiredError
 from urllib.parse import urlparse
 import itertools
 import re
@@ -30,6 +31,7 @@ class Command:
         self._session = None
         self._language_code = None
         self._tag_namespace = TAG_NAMESPACE
+        self.actor_id = None
 
     def logged_in_actor_id(self) -> str:
         if self._logged_in_actor_id is None:
@@ -54,7 +56,20 @@ class Command:
         if self._logged_in_actor is None:
             id = self.logged_in_actor_id()
             oauth = self.session()
-            r = oauth.get(id, headers=BASE_HEADERS)
+            try:
+                r = oauth.get(id, headers=BASE_HEADERS)
+            except TokenExpiredError as e:
+                (client_id, auth_endpoint, token_endpoint) = \
+                self.discover(id)
+                refresh_token = self.token_file_data()['refresh_token']
+                extra = {
+                    'client_id': client_id,
+                }
+                token = oauth.refresh_token(token_endpoint, refresh_token=refresh_token, **extra)
+                self.actor_id = client_id
+                self.save_token(token)
+                oauth = self.session()
+                r = oauth.get(id, headers=BASE_HEADERS)
             r.raise_for_status()
             self._logged_in_actor = r.json()
         return self._logged_in_actor
@@ -373,3 +388,84 @@ class Command:
                 return self._get_href(prop[0])
             else:
                 return None
+
+    def discover(self, actor_id):
+
+        parts = self.discover_well_known(actor_id)
+
+        if parts is not None:
+            return parts
+
+        parts = self.discover_actor(actor_id)
+
+        if parts is not None:
+            return parts
+
+        raise Exception('No OAuth metadata discoverable')
+
+    def discover_well_known(self, actor_id):
+        parsed = urlparse(actor_id)
+        origin = f"{parsed.scheme}://{parsed.netloc}"
+        metadata_url = f"{origin}/.well-known/oauth-authorization-server"
+        user_agent = f"ap/{__version__}"
+        headers = {
+            "Accept": "application/json",
+            "User-Agent": user_agent
+        }
+
+        r = requests.get(metadata_url, headers=headers)
+
+        if not r.ok:
+            return None
+
+        metadata = r.json()
+
+        # TODO: check for PKCE, authorization code flow, refresh
+
+        if "authorization_endpoint" not in metadata:
+            return None
+
+        auth_endpoint = metadata["authorization_endpoint"]
+
+        if "token_endpoint" not in metadata:
+            return None
+
+        token_endpoint = metadata["token_endpoint"]
+
+        if "client_id_metadata_document_supported" in metadata and \
+            metadata["client_id_metadata_document_supported"]:
+            client_id = CIMD_ID
+        elif "activitypub_object_id_as_client_id" in metadata and \
+            metadata["activitypub_object_id_as_client_id"]:
+            client_id = CLIENT_ID
+        elif "registration_endpoint" in metadata:
+            issuer = metadata["issuer"]
+            client_id = self.get_client_id(issuer)
+            if client_id is None:
+                client_id = self.register_client(
+                    metadata['registration_endpoint']
+                )
+                self.set_client_id(issuer, client_id)
+        else:
+            return None
+
+        return (client_id, auth_endpoint, token_endpoint)
+            
+    def apdir(self):
+        return Path(self.env.get("HOME")) / ".ap"
+
+    def get_client_id(self, issuer):
+        path = self.apdir() / "client_ids.json"
+        if not path.exists():
+            return None
+        with open(path, "r") as f:
+            data = json.load(f)
+        return data.get(issuer, None)
+
+    def save_token(self, token):
+        apdir = self.apdir()
+        if not apdir.exists():
+            apdir.mkdir(0o700)
+        data = {"actor_id": self.actor_id, **token}
+        with open(apdir / "token.json", "w") as f:
+            f.write(json.dumps(data))
