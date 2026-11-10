@@ -59,20 +59,24 @@ class Command:
             try:
                 r = oauth.get(id, headers=BASE_HEADERS)
             except TokenExpiredError as e:
-                (client_id, auth_endpoint, token_endpoint) = \
-                self.discover(id)
-                refresh_token = self.token_file_data()['refresh_token']
-                extra = {
-                    'client_id': client_id,
-                }
-                token = oauth.refresh_token(token_endpoint, refresh_token=refresh_token, **extra)
-                self.actor_id = client_id
-                self.save_token(token)
-                oauth = self.session()
-                r = oauth.get(id, headers=BASE_HEADERS)
+                r = self.refresh_token(id)
             r.raise_for_status()
             self._logged_in_actor = r.json()
         return self._logged_in_actor
+    
+    def refresh_token(self, id) ->  requests.Response:
+        oauth = self.session()
+        (client_id, auth_endpoint, token_endpoint) = \
+        self.discover(id)
+        refresh_token = self.token_file_data()['refresh_token']
+        extra = {
+            'client_id': client_id,
+        }
+        token = oauth.refresh_token(token_endpoint, refresh_token=refresh_token, **extra)
+        self.actor_id = id
+        self.save_token(token)
+        oauth = self.session()
+        return oauth.get(id, headers=BASE_HEADERS)
 
     def session(self) -> OAuth2Session:
         if self._session is None:
