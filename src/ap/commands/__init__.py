@@ -9,6 +9,7 @@ from .get import GetCommand
 from .inbox import InboxCommand
 from .login import LoginCommand
 from .logout import LogoutCommand
+from .refresh_token import RefreshTokenCommand
 from .outbox import OutboxCommand
 from .pending_followers import PendingFollowersCommand
 from .pending_following import PendingFollowingCommand
@@ -42,6 +43,7 @@ __all__ = [
     "LikesCommand",
     "LoginCommand",
     "LogoutCommand",
+    "RefreshTokenCommand",
     "OutboxCommand",
     "PendingFollowersCommand",
     "PendingFollowingCommand",
