@@ -60,6 +60,10 @@ If this command fails, it's likely that your server doesn't support the Activity
 
 Logs out of the current session by deleting the token file.
 
+### `ap refresh_token`
+
+Refresh the access token (It will do this automatically for most operations if needed when access token has expired).
+
 ### `ap whoami`
 
 Shows the currently logged-in user.

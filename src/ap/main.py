@@ -25,6 +25,8 @@ def make_parser():
 
     subparsers.add_parser("logout", help="Log out of the current session")
 
+    subparsers.add_parser("refresh_token", help="Refresh the oauth2 access token")
+
     subparsers.add_parser("whoami", help="Show the current user")
 
     get_parser = subparsers.add_parser("get", help="Get an object by ID")
@@ -248,6 +250,7 @@ def get_command(args, env):
     map = {
         "login": commands.LoginCommand,
         "logout": commands.LogoutCommand,
+        "refresh_token": commands.RefreshTokenCommand,
         "whoami": commands.WhoamiCommand,
         "get": commands.GetCommand,
         "inbox": commands.InboxCommand,
