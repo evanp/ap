@@ -13,17 +13,17 @@ class UndoFollowCommand(Command):
             print("No actor found for %s" % self.id)
             return
 
-        # Try pending first (we might get lucky)
-
-        coll = self.get_actor_collection("pendingFollowing")
-
         found = None
-
-        for item in self.items(coll):
-            activity = self.to_object(item, ["object", "type"])
-            if actor_id == self.to_id(activity["object"]):
-                found = activity
-                break
+        # Try pending first (we might get lucky)
+        try:
+            coll = self.get_actor_collection("pendingFollowing")
+            for item in self.items(coll):
+                activity = self.to_object(item, ["object", "type"])
+                if actor_id == self.to_id(activity["object"]):
+                    found = activity
+                    break
+        except Exception:
+            pass
 
         if found is None:
             coll = self.get_actor_collection("outbox")
